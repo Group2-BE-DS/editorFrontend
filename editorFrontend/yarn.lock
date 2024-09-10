@@ -804,7 +804,7 @@ chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.1:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chokidar@^3.5.3:
+chokidar@^3.5.0, chokidar@^3.5.3:
   version "3.6.0"
   resolved "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz"
   integrity sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==
@@ -1006,6 +1006,13 @@ daisyui@^4.12.10:
     picocolors "^1"
     postcss-js "^4"
 
+date-time@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/date-time/-/date-time-3.1.0.tgz"
+  integrity sha512-uqCUKXE5q1PNBXjPqvwhwJf9SwMoAHBgWJ6DcrnS5o+W2JOiIILl0JEdVD8SGujrNS02GGxgwAg2PN2zONgtjg==
+  dependencies:
+    time-zone "^1.0.0"
+
 debug@^2.2.0:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
@@ -1099,6 +1106,22 @@ eastasianwidth@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz"
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
+
+electron-is-dev@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/electron-is-dev/-/electron-is-dev-1.2.0.tgz"
+  integrity sha512-R1oD5gMBPS7PVU8gJwH6CtT0e6VSoD0+SzSnYpNm+dBkcijgA+K7VAMHDfnRq/lkKPZArpzplTW6jfiMYosdzw==
+
+electron-reloader@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.npmjs.org/electron-reloader/-/electron-reloader-1.2.3.tgz"
+  integrity sha512-aDnACAzNg0QvQhzw7LYOx/nVS10mEtbuG6M0QQvNQcLnJEwFs6is+EGRCnM+KQlQ4KcTbdwnt07nd7ZjHpY4iw==
+  dependencies:
+    chalk "^4.1.0"
+    chokidar "^3.5.0"
+    date-time "^3.1.0"
+    electron-is-dev "^1.2.0"
+    find-up "^5.0.0"
 
 electron-squirrel-startup@^1.0.1:
   version "1.0.1"
@@ -3163,6 +3186,11 @@ thenify-all@^1.0.0:
   integrity sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==
   dependencies:
     any-promise "^1.0.0"
+
+time-zone@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/time-zone/-/time-zone-1.0.0.tgz"
+  integrity sha512-TIsDdtKo6+XrPtiTm1ssmMngN1sAhyKnTO2kunQWqNPWIVvCm15Wmw4SWInwTVgJ5u/Tr04+8Ei9TNcw4x4ONA==
 
 to-regex-range@^5.0.1:
   version "5.0.1"
