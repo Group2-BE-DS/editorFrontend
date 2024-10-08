@@ -3,8 +3,8 @@ const path = require('node:path');
 const { spawn } = require('child_process');
 
 function startDjangoServer() {
-  const djangoBackend = spawn('E:\\sem7\\Major-proj\\waumeditor\\backend\\env\\Scripts\\python.exe', [
-    'E:\\sem7\\Major-proj\\waumeditor\\backend\\editorBackend\\manage.py',
+  const djangoBackend = spawn('E:\\MJ\\editorBackend\\editorBackend\\env\\Scripts\\python.exe', [
+    'E:\\MJ\\editorBackend\\manage.py',
     'runserver',
     '--noreload',
   ]);
