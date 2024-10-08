@@ -32,6 +32,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "codemirror": "^6.0.1",
+    "electron-prebuilt-compile": "^8.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "flowbite": "^2.5.1"
   }
