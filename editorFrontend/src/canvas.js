@@ -12,20 +12,27 @@ require('codemirror/lib/codemirror.css');
 require('codemirror/theme/dracula.css'); // Optional: You can change the theme
 
 // Initialize the CodeMirror editor
-let editor;
-window.onload = () => {
-    editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-        mode: 'javascript', // Default mode
-        theme: 'dracula', // Default theme
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize CodeMirror
+    const editorElement = document.getElementById('editor');
+    const languageSelect = document.getElementById('languageSelect');
+
+    // Create a CodeMirror instance
+    const editor = CodeMirror.fromTextArea(editorElement, {
         lineNumbers: true,
-        tabSize: 2,
-        viewportMargin: Infinity // Keeps the height of the editor fixed
+        mode: languageSelect.value, // Set the initial mode
+        theme: 'dracula',
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        lineWrapping: true,
     });
 
-    // Language Selector Event
-    const languageSelect = document.getElementById('languageSelect');
-    languageSelect.addEventListener('change', (event) => {
-        const selectedLanguage = event.target.value;
-        editor.setOption('mode', selectedLanguage); // Update the editor mode based on selection
+    // Hide the original textarea
+    editorElement.style.display = 'none';
+
+    // Update the CodeMirror mode when the language is changed
+    languageSelect.addEventListener('change', function () {
+        const selectedMode = this.value;
+        editor.setOption('mode', selectedMode);
     });
-};
+});
