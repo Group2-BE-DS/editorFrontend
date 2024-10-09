@@ -26,7 +26,7 @@
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 bg-gray-800">
             <ul class="space-y-2 font-medium">
                 <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
+                    <a href="index.html" class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
                         <span class="ms-3">Dashboard</span>
                     </a>
                 </li>
@@ -207,6 +207,25 @@
             // Add your Go linting logic here
             return found;
         });
+
+        const socket = new WebSocket('ws://localhost:8000/ws/editor/'); // Update this URL to your WebSocket endpoint
+
+            socket.onopen = function() {
+                console.log('WebSocket connection established.');
+            };
+
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'update') {
+                    editor.setValue(data.content);
+                }
+            };
+
+            // Send updates to the server
+            editor.on('change', function() {
+                const content = editor.getValue();
+                socket.send(JSON.stringify({ type: 'update', content: content }));
+            });
     </script>
 </body>
 </html>
