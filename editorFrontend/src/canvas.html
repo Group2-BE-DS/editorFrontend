@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor</title>
+    <title>Advanced Editor with Autocompletion, Linting, and More</title>
     <link rel="stylesheet" href="../node_modules/flowbite/dist/flowbite.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
@@ -67,10 +67,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/ruby/ruby.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/go/go.min.js"></script>
 
-    <!-- Inline Script to initialize CodeMirror -->
+    <!-- Addons for autocompletion, linting, and more -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/comment-fold.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/comment/comment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/comment/continuecomment.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/history/history.min.js"></script>
+
+    <!-- Inline Script to initialize CodeMirror with autocompletion, linting, search & replace, and more -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize CodeMirror
             const editorElement = document.getElementById('editor');
             const languageSelect = document.getElementById('languageSelect');
 
@@ -82,12 +105,36 @@
                 autoCloseBrackets: true,
                 matchBrackets: true,
                 lineWrapping: true,
+                foldGutter: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"], // Gutter for folding & linting
+                lint: true, // Enable linting
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete", // Enable autocompletion with Ctrl+Space
+                    "Ctrl-F": "find", // Enable search
+                    "Ctrl-H": "replace", // Enable search & replace
+                    "Ctrl-Z": function(cm) { cm.undo(); }, // Undo
+                    "Ctrl-Y": function(cm) { cm.redo(); }  // Redo
+                },
             });
 
             // Update the CodeMirror mode when the language is changed
             languageSelect.addEventListener('change', function () {
                 const selectedMode = this.value;
                 editor.setOption('mode', selectedMode);
+            });
+
+            // Example of adding linting rules (You can configure your own rules)
+            CodeMirror.registerHelper("lint", "javascript", function(text) {
+                const found = [];
+                if (!text.includes('console')) {
+                    found.push({
+                        message: "You must use 'console' in your code",
+                        severity: "error",
+                        from: CodeMirror.Pos(0, 0),
+                        to: CodeMirror.Pos(1, 0)
+                    });
+                }
+                return found;
             });
         });
     </script>
