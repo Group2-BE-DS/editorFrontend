@@ -6,6 +6,8 @@
     <title>Editor</title>
     <link rel="stylesheet" href="../node_modules/flowbite/dist/flowbite.min.css">
     <link rel="stylesheet" href="index.css">
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark:bg-gray-900 h-screen overflow-hidden">
     <!-- Navbar -->
@@ -126,10 +128,10 @@
       <!--div class="p-4 border-2 border-gray-200 border-dashed rounded-lg border-gray-700">-->
          <div class="grid grid-cols-3 gap-4 mb-4">
             <!--div class="flex items-center justify-center h-24 rounded bg-gray-50 bg-gray-800"-->
-               <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+               <!--div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
                   <div class="flex justify-between">
                      <div>
-                        <h5 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">32.4k</h5>
+                        <h7 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">32.4k</h7>
                         <p class="text-base font-normal text-gray-500 dark:text-gray-400">Users this week</p>
                      </div>
                      <div class="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
@@ -142,8 +144,8 @@
                   <div id="area-chart"></div>
                   <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
                      <div class="flex justify-between items-center pt-5">
-                        <!-- Button -->
-                         <button
+                        <!--Button -->
+                         <!--button
                          id="dropdownDefaultButton"
                          data-dropdown-toggle="lastDaysdropdown"
                          data-dropdown-placement="bottom"
@@ -155,7 +157,7 @@
                         </svg>
                      </button>
                      <!-- Dropdown menu -->
-                      <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                      <!--div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                            <li>
                               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
@@ -182,96 +184,196 @@
                      </a>
                   </div>
                </div>
-            </div>
- 
+            </div-->
 
 
-               <p class="text-2xl text-gray-400 text-gray-500">
-               <!-------------------->>
-                  <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
-                     <div class="flex justify-between items-start w-full">
-                        <div class="flex-col items-center">
-                           <div class="flex items-center mb-1">
-                              <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white me-1">Website traffic</h5>
-                              <svg data-popover-target="chart-info" data-popover-placement="bottom" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
-                              </svg>
-                              <div data-popover id="chart-info" role="tooltip" class="absolute z-10 invisible inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
-                                 <div class="p-3 space-y-2">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">Activity growth - Incremental</h3>
-                                    <p>Report helps navigate cumulative growth of community activities. Ideally, the chart should have a growing trend, as stagnating chart signifies a significant decrease of community activity.</p>
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">Calculation</h3>
-                                    <p>For each date bucket, the all-time volume of activities is calculated. This means that activities in period n contain all activities up to period n, plus the activities generated by your community in period.</p>
-                                    <a href="#" class="flex items-center font-medium text-blue-600 dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:underline">Read more <svg class="w-2 h-2 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                                    </svg></a>
-                                 </div>
-                                 <div data-popper-arrow></div>
-                              </div>
-                           </div>
-                           <button id="dateRangeButton" data-dropdown-toggle="dateRangeDropdown" data-dropdown-ignore-click-outside-class="datepicker" type="button" class="inline-flex items-center text-blue-700 dark:text-blue-600 font-medium hover:underline">31 Nov - 31 Dev <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                           </svg>
-                        </button>
-                        <div id="dateRangeDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-80 lg:w-96 dark:bg-gray-700 dark:divide-gray-600">
-                           <div class="p-3" aria-labelledby="dateRangeButton">
-                              <div date-rangepicker datepicker-autohide class="flex items-center">
-                                 <div class="relative">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                       <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                          <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                                       </svg>
-                                    </div>
-                                    <input name="start" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Start date">
-                                 </div>
-                                 <span class="mx-2 text-gray-500 dark:text-gray-400">to</span>
-                                 <div class="relative">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                       <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                          <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                                       </svg>
-                                    </div>
-                                    <input name="end" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="End date">
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="flex justify-end items-center">
-                        <button id="widgetDropdownButton" data-dropdown-toggle="widgetDropdown" data-dropdown-placement="bottom" type="button"  class="inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm"><svg class="w-3.5 h-3.5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
-                           <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
-                        </svg><span class="sr-only">Open dropdown</span>
-                     </button>
-                     <div id="widgetDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="widgetDropdownButton">
-                           <li>
-                              <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><svg class="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 21">
-                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.418 17.861 1 20l2.139-6.418m4.279 4.279 10.7-10.7a3.027 3.027 0 0 0-2.14-5.165c-.802 0-1.571.319-2.139.886l-10.7 10.7m4.279 4.279-4.279-4.279m2.139 2.14 7.844-7.844m-1.426-2.853 4.279 4.279"/>
-                              </svg>Edit widget
-                           </a>
-                        </li>
-                        <li>
-                           <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><svg class="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
-                              <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
-                           </svg>Download data
-                        </a>
-                     </li>
-                     <li>
-                        <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><svg class="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5.953 7.467 6.094-2.612m.096 8.114L5.857 9.676m.305-1.192a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0ZM17 3.84a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Zm0 10.322a2.581 2.581 0 1 1-5.162 0 2.581 2.581 0 0 1 5.162 0Z"/>
-                        </svg>Add to repository
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"><svg class="w-3 h-3 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                        <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z"/>
-                     </svg>Delete widget
-                  </a>
-               </li>
-            </ul>
+<!--graph1-->
+            <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+               <div class="flex justify-between">
+                 <div>
+                   <h5 class="leading-none text-xl font-bold text-gray-900 dark:text-white pb-2">32.4k</h5>
+                   <p class="text-xs font-normal text-gray-500 dark:text-gray-400">Users this week</p>
+                 </div>
+                 <div class="flex items-center px-2 py-0.5 text-xs font-semibold text-green-500 dark:text-green-500 text-center">
+                   12%
+                   <svg class="w-2 h-2 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+                   </svg>
+                 </div>
+               </div>
+               <!-- Reduced Height of the Graph Container -->
+               <div id="area-chart" style="height: 180px; padding-top: 10px;">
+                 <canvas id="activityChart" width="400" height="180"></canvas>
+               </div>
+               <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+                 <div class="flex justify-between items-center pt-5">
+                   <button
+                     id="dropdownDefaultButton"
+                     data-dropdown-toggle="lastDaysdropdown"
+                     data-dropdown-placement="bottom"
+                     class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                     type="button">
+                     Last 7 days
+                     <svg class="w-1.5 m-2 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                     </svg>
+                   </button>
+                   <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                       <ul class="py-2 text-xs text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
+                         </li>
+                       </ul>
+                   </div>
+                   <a href="#" class="uppercase text-xs font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                     Users Report
+                     <svg class="w-2 h-2 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                     </svg>
+                   </a>
+                 </div>
+               </div>
+             </div>
+
+             
+             
+             <!-- Include Chart.js library -->
+             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+             
+             <!-- Chart.js Script for Enhanced Visibility -->
+             <script>
+                 const ctx = document.getElementById('activityChart').getContext('2d');
+                 const activityChart = new Chart(ctx, {
+                     type: 'line',
+                     data: {
+                         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                         datasets: [{
+                             label: 'Coding Hours',
+                             data: [1, 2, 3, 4, 5, 3, 2],
+                             fill: false,
+                             borderColor: 'rgba(75, 192, 192, 1)',
+                             borderWidth: 4, // Maintain line thickness
+                             pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                             pointBorderColor: '#fff',
+                             pointHoverRadius: 8, // Point size on hover
+                             pointHoverBackgroundColor: 'rgba(75, 192, 192, 1)',
+                             pointHoverBorderColor: 'rgba(220, 220, 220, 1)',
+                             pointRadius: 6, // Base point size
+                             pointBorderWidth: 3 // Point border thickness
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false, // Ensure chart fits the container
+                         plugins: {
+                             legend: {
+                                 display: true,
+                                 position: 'top'
+                             },
+                             tooltip: {
+                                 enabled: true,
+                                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                 titleColor: '#fff',
+                                 bodyColor: '#fff'
+                             }
+                         },
+                         scales: {
+                             x: {
+                                 grid: {
+                                     display: true, // Enable X-axis grid lines
+                                     color: 'rgba(200, 200, 200, 0.2)'
+                                 },
+                                 title: {
+                                     display: true,
+                                     text: 'Days of the Week',
+                                     color: '#666',
+                                     font: {
+                                         size: 12
+                                     }
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     display: true, // Enable Y-axis grid lines
+                                     color: 'rgba(200, 200, 200, 0.2)'
+                                 },
+                                 title: {
+                                     display: true,
+                                     text: 'Hours Spent',
+                                     color: '#666',
+                                     font: {
+                                         size: 12
+                                     }
+                                 },
+                                 min: 0,
+                                 max: 6
+                             }
+                         }
+                     }
+                 });
+             </script>
+
+             
+<!--Graph2-->
+<div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+   <div class="flex justify-between items-start w-full">
+     <div class="flex-col items-center">
+       <div class="flex items-center mb-1">
+         <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white me-1">Website traffic</h5>
+         <svg data-popover-target="chart-info" data-popover-placement="bottom" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+           <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
+         </svg>
+         <!-- Tooltip -->
+         <div data-popover id="chart-info" role="tooltip" class="absolute z-10 invisible inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
+           <div class="p-3 space-y-2">
+             <h3 class="font-semibold text-gray-900 dark:text-white">Activity growth - Incremental</h3>
+             <p>Report helps navigate cumulative growth of community activities...</p>
+             <a href="#" class="flex items-center font-medium text-blue-600 dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:underline">Read more <svg class="w-2 h-2 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+             </svg></a>
+           </div>
          </div>
-      </div>
+       </div>
+     </div>
+     <button id="dateRangeButton" data-dropdown-toggle="dateRangeDropdown" data-dropdown-ignore-click-outside-class="datepicker" type="button" class="inline-flex items-center text-blue-700 dark:text-blue-600 font-medium hover:underline">31 Nov - 31 Dev <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+     </svg></button>
+     <!-- Date Range Dropdown -->
+     <div id="dateRangeDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-80 lg:w-96 dark:bg-gray-700 dark:divide-gray-600">
+       <div class="p-3" aria-labelledby="dateRangeButton">
+         <div date-rangepicker datepicker-autohide class="flex items-center">
+           <div class="relative">
+             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+               <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+               </svg>
+             </div>
+             <input name="start" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Start date">
+           </div>
+           <span class="mx-2 text-gray-500 dark:text-gray-400">to</span>
+           <div class="relative">
+             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+               <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+               </svg>
+             </div>
+             <input name="end" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="End date">
+           </div>
+         </div>
+       </div>
+     </div>
    </div>
  
    <!-- Line Chart -->
@@ -280,150 +382,165 @@
    <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
      <div class="flex justify-between items-center pt-5">
        <!-- Button -->
-       <button
-         id="dropdownDefaultButton"
-         data-dropdown-toggle="lastDaysdropdown"
-         data-dropdown-placement="bottom"
-         class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-         type="button">
-         Last 7 days
-         <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-         </svg>
-       </button>
-       <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-             <li>
-               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
-             </li>
-             <li>
-               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
-             </li>
-             <li>
-               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
-             </li>
-             <li>
-               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
-             </li>
-             <li>
-               <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
-             </li>
-           </ul>
+       <button id="timeFrameButton" data-dropdown-toggle="timeFrameDropdown" type="button" class="inline-flex items-center text-blue-700 dark:text-blue-600 font-medium hover:underline">Last 7 days <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+       </svg></button>
+       <!-- Time Frame Dropdown -->
+       <div id="timeFrameDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-80 lg:w-96 dark:bg-gray-700 dark:divide-gray-600">
+         <ul class="py-2" aria-labelledby="timeFrameButton">
+           <li>
+             <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Last 7 days</a>
+           </li>
+           <li>
+             <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Last 30 days</a>
+           </li>
+           <li>
+             <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Last year</a>
+           </li>
+         </ul>
        </div>
-       <a
-         href="#"
-         class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-         Traffic analysis
-         <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-         </svg>
-       </a>
      </div>
    </div>
  </div>
+
+
+
+
+ <!--Graphhhhhhhhhhhhhhhh3-->
+
+ 
+ <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4">
+   <div class="flex justify-between mb-4">
+       <div class="grid gap-4 grid-cols-2">
+           <div>
+               <h5 class="inline-flex items-center text-gray-500 dark:text-gray-400 leading-none font-normal mb-1">Clicks</h5>
+               <p class="text-gray-900 dark:text-white text-2xl leading-none font-bold">42,3k</p>
+           </div>
+           <div>
+               <h5 class="inline-flex items-center text-gray-500 dark:text-gray-400 leading-none font-normal mb-1">CPC</h5>
+               <p class="text-gray-900 dark:text-white text-2xl leading-none font-bold">$5.40</p>
+           </div>
+       </div>
+       <div>
+           <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown" data-dropdown-placement="bottom" 
+                   type="button" 
+                   class="px-3 py-2 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+               Last week
+               <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+               </svg>
+           </button>
+       </div>
+   </div>
+
+   <!-- Chart container with reduced height -->
+   <div class="py-4" style="height: 250px;">
+       <canvas id="lineChart"></canvas>
+   </div>
+
+   <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-2.5">
+       <div class="pt-4">
+           <a href="#" class="px-4 py-2 text-sm font-medium text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+               <svg class="w-3.5 h-3.5 text-white me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                   <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Zm-3 15H4.828a1 1 0 0 1 0-2h6.238a1 1 0 0 1 0 2Zm0-4H4.828a1 1 0 0 1 0-2h6.238a1 1 0 1 1 0 2Z"/>
+                   <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
+               </svg>
+               View full report
+           </a>
+       </div>
+   </div>
+</div>
+
+<script>
+   // Data for the line chart
+   const data = {
+       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+       datasets: [{
+           label: 'Clicks',
+           data: [12000, 15000, 13000, 20000, 22000, 21000, 25000],
+           borderColor: '#377DFF',
+           backgroundColor: 'rgba(55, 125, 255, 0.2)',
+           fill: true,
+           tension: 0.4
+       }]
+   };
+
+   // Config for the line chart with adjusted options
+   const config = {
+       type: 'line',
+       data: data,
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           layout: {
+               padding: {
+                   top: 10,
+                   bottom: 10,
+                   left: 10,
+                   right: 10
+               }
+           },
+           plugins: {
+               legend: {
+                   position: 'top'
+               },
+               tooltip: {
+                   callbacks: {
+                       label: function(context) {
+                           return context.dataset.label + ': ' + context.raw;
+                       }
+                   }
+               }
+           },
+           scales: {
+               x: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Day of the Week'
+                   }
+               },
+               y: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Clicks'
+                   }
+               }
+           }
+       }
+   };
+
+   // Render the chart
+   const lineChart = new Chart(
+       document.getElementById('lineChart'),
+       config
+   );
+</script>
+
+
+ 
+ 
+ 
  
 
 
 
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center h-24 rounded bg-gray-50 bg-gray-800">
-               <p class="text-2xl text-gray-400 text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center h-24 rounded bg-gray-50 bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-         </div>
-         <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-            <p class="text-2xl text-gray-400 dark:text-gray-500">
-               <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-               </svg>
-            </p>
-         </div>
-         <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-         </div>
-         <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-            <p class="text-2xl text-gray-400 dark:text-gray-500">
-               <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-               </svg>
-            </p>
-         </div>
-         <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-            <div class="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-               <p class="text-2xl text-gray-400 dark:text-gray-500">
-                  <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                  </svg>
-               </p>
-            </div>
-         </div>
-      </div>
-   </div>
+             
+             
+
+
    
    
     <!-- Main content -->
+    <!--------------------------------------> 
+
+    
+
+
+
+
+
 
 
     <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
