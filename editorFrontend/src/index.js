@@ -3,11 +3,13 @@ const path = require('node:path');
 const { spawn } = require('child_process');
 
 function startDjangoServer() {
-  const djangoBackend = spawn('E:\\MJ\\editorBackend\\editorBackend\\env\\Scripts\\python.exe', [
-    'E:\\MJ\\editorBackend\\manage.py',
-    'runserver',
-    '--noreload',
-  ]);
+  // Define the command to activate the virtual environment and run the Django server
+  const djangoBackend = spawn('cmd.exe', [
+    '/c', // Use /c to run the command and then terminate
+    'E:\\MJ\\editorBackend\\editorBackend\\env\\Scripts\\activate && python E:\\MJ\\editorBackend\\manage.py runserver --noreload'
+  ], {
+    shell: true, // Use shell to allow command chaining
+  });
 
   djangoBackend.stdout.on('data', (data) => {
     console.log(`Django server stdout:\n${data}`);

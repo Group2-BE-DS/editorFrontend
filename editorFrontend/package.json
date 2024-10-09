@@ -32,9 +32,13 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.34.1",
     "codemirror": "^6.0.1",
     "electron-prebuilt-compile": "^8.2.0",
     "electron-squirrel-startup": "^1.0.1",
-    "flowbite": "^2.5.1"
+    "flowbite": "^2.5.1",
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.19"
   }
 }
