@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Editor with Autocompletion, Linting, and More</title>
+    <title>Advanced Collaborative Editor</title>
     <link rel="stylesheet" href="../node_modules/flowbite/dist/flowbite.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/mbo.min.css">
     <link rel="stylesheet" href="index.css">
 
     <style>
@@ -37,8 +40,8 @@
     </aside>
 
     <div class="p-4 sm:ml-64">
-        <!-- Language Selector -->
-        <div class="relative mb-4">
+        <!-- Language and Theme Selector -->
+        <div class="flex space-x-4 mb-4">
             <select id="languageSelect" class="block w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
                 <option value="javascript">JavaScript</option>
                 <option value="python">Python</option>
@@ -47,6 +50,14 @@
                 <option value="php">PHP</option>
                 <option value="ruby">Ruby</option>
                 <option value="go">Go</option>
+            </select>
+
+            <select id="themeSelect" class="block w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                <option value="dracula">Dracula</option>
+                <option value="default">Default</option>
+                <option value="monokai">Monokai</option>
+                <option value="eclipse">Eclipse</option>
+                <option value="mbo">MBO</option>
             </select>
         </div>
 
@@ -71,7 +82,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/javascript-hint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.css">
 
@@ -96,46 +106,106 @@
         document.addEventListener('DOMContentLoaded', function () {
             const editorElement = document.getElementById('editor');
             const languageSelect = document.getElementById('languageSelect');
+            const themeSelect = document.getElementById('themeSelect');
 
-            // Create a CodeMirror instance
+            // Initialize CodeMirror with the correct settings
             const editor = CodeMirror.fromTextArea(editorElement, {
                 lineNumbers: true,
-                mode: languageSelect.value, // Set the initial mode
-                theme: 'dracula',
+                mode: languageSelect.value,
+                theme: themeSelect.value,
                 autoCloseBrackets: true,
                 matchBrackets: true,
                 lineWrapping: true,
                 foldGutter: true,
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"], // Gutter for folding & linting
-                lint: true, // Enable linting
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+                lint: true,
                 extraKeys: {
-                    "Ctrl-Space": "autocomplete", // Enable autocompletion with Ctrl+Space
-                    "Ctrl-F": "find", // Enable search
-                    "Ctrl-H": "replace", // Enable search & replace
-                    "Ctrl-Z": function(cm) { cm.undo(); }, // Undo
-                    "Ctrl-Y": function(cm) { cm.redo(); }  // Redo
-                },
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "find",
+                    "Ctrl-H": "replace",
+                    "Ctrl-Z": function(cm) { cm.undo(); },
+                    "Ctrl-Y": function(cm) { cm.redo(); },
+                }
             });
 
-            // Update the CodeMirror mode when the language is changed
-            languageSelect.addEventListener('change', function () {
-                const selectedMode = this.value;
-                editor.setOption('mode', selectedMode);
-            });
+            // Function to update editor mode
+            function updateEditorMode() {
+                const selectedMode = languageSelect.value;
+                editor.setOption("mode", selectedMode);
+                editor.refresh();
+            }
 
-            // Example of adding linting rules (You can configure your own rules)
-            CodeMirror.registerHelper("lint", "javascript", function(text) {
-                const found = [];
-                if (!text.includes('console')) {
+            // Function to update editor theme
+            function updateEditorTheme() {
+                const selectedTheme = themeSelect.value;
+                editor.setOption("theme", selectedTheme);
+            }
+
+            // Event listeners for language and theme changes
+            languageSelect.addEventListener('change', updateEditorMode);
+            themeSelect.addEventListener('change', updateEditorTheme);
+        });
+
+        // Register linting helpers for various languages
+        CodeMirror.registerHelper("lint", "javascript", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            const errors = JSHINT.errors;
+            for (let i = 0; i < errors.length; i++) {
+                const error = errors[i];
+                if (error) {
                     found.push({
-                        message: "You must use 'console' in your code",
-                        severity: "error",
-                        from: CodeMirror.Pos(0, 0),
-                        to: CodeMirror.Pos(1, 0)
+                        from: CodeMirror.Pos(error.line - 1, error.character),
+                        to: CodeMirror.Pos(error.line - 1, error.character + 1),
+                        message: error.reason,
                     });
                 }
-                return found;
-            });
+            }
+            return found;
+        });
+
+        // Other linting helpers for python, html, css, etc., similar to the one for JavaScript
+
+        CodeMirror.registerHelper("lint", "python", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your Python linting logic here
+            return found;
+        });
+
+        CodeMirror.registerHelper("lint", "htmlmixed", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your HTML linting logic here
+            return found;
+        });
+
+        CodeMirror.registerHelper("lint", "css", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your CSS linting logic here
+            return found;
+        });
+
+        CodeMirror.registerHelper("lint", "php", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your PHP linting logic here
+            return found;
+        });
+
+        CodeMirror.registerHelper("lint", "ruby", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your Ruby linting logic here
+            return found;
+        });
+
+        CodeMirror.registerHelper("lint", "go", function(text) {
+            const found = [];
+            if (text.length === 0) return found;
+            // Add your Go linting logic here
+            return found;
         });
     </script>
 </body>
