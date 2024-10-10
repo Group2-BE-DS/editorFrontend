@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="../node_modules/flowbite/dist/flowbite.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/eclipse.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/mbo.min.css">
-    <link rel="stylesheet" href="index.css">
-
     <style>
         .CodeMirror {
             height: 90vh;
@@ -25,24 +20,15 @@
     <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 bg-gray-800">
             <ul class="space-y-2 font-medium">
-                <li>
-                    <a href="index.html" class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
-                        <span class="ms-3">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="canvas.html" class="flex items-center p-2 text-gray-900 rounded-lg text-white hover:bg-gray-100 hover:bg-gray-700 group">
-                        <span class="ms-3">Public Repository</span>
-                    </a>
-                </li>
+                <li><a href="index.html" class="text-white">Dashboard</a></li>
+                <li><a href="canvas.html" class="text-white">Public Repository</a></li>
             </ul>
         </div>
     </aside>
 
     <div class="p-4 sm:ml-64">
-        <!-- Language and Theme Selector -->
         <div class="flex space-x-4 mb-4">
-            <select id="languageSelect" class="block w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+            <select id="languageSelect" class="block w-full p-2 border rounded-lg">
                 <option value="javascript">JavaScript</option>
                 <option value="python">Python</option>
                 <option value="htmlmixed">HTML</option>
@@ -51,181 +37,93 @@
                 <option value="ruby">Ruby</option>
                 <option value="go">Go</option>
             </select>
-
-            <select id="themeSelect" class="block w-full p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+            <select id="themeSelect" class="block w-full p-2 border rounded-lg">
                 <option value="dracula">Dracula</option>
                 <option value="default">Default</option>
-                <option value="monokai">Monokai</option>
-                <option value="eclipse">Eclipse</option>
-                <option value="mbo">MBO</option>
             </select>
         </div>
 
-        <!-- Textarea for CodeMirror -->
-        <div class="relative">
-            <textarea id="editor" placeholder="Start typing your code..."></textarea>
-        </div>
+        <textarea id="editor" placeholder="Start typing your code..."></textarea>
     </div>
 
-    <!-- Main content -->
+    <!-- Scripts -->
     <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.4/jshint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/php/php.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/ruby/ruby.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/go/go.min.js"></script>
-
-    <!-- Addons for autocompletion, linting, and more -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.min.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/search.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/searchcursor.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/dialog/dialog.min.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/foldgutter.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/brace-fold.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/fold/comment-fold.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/matchbrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/comment/comment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/comment/continuecomment.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/history/history.min.js"></script>
-
-    <!-- Inline Script to initialize CodeMirror with autocompletion, linting, search & replace, and more -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const editorElement = document.getElementById('editor');
-            const languageSelect = document.getElementById('languageSelect');
-            const themeSelect = document.getElementById('themeSelect');
+   document.addEventListener('DOMContentLoaded', function () {
+    const editorElement = document.getElementById('editor');
+    const languageSelect = document.getElementById('languageSelect');
+    const themeSelect = document.getElementById('themeSelect');
 
-            // Initialize CodeMirror with the correct settings
-            const editor = CodeMirror.fromTextArea(editorElement, {
-                lineNumbers: true,
-                mode: languageSelect.value,
-                theme: themeSelect.value,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                lineWrapping: true,
-                foldGutter: true,
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
-                lint: true,
-                extraKeys: {
-                    "Ctrl-Space": "autocomplete",
-                    "Ctrl-F": "find",
-                    "Ctrl-H": "replace",
-                    "Ctrl-Z": function(cm) { cm.undo(); },
-                    "Ctrl-Y": function(cm) { cm.redo(); },
-                }
-            });
+    // Initialize CodeMirror
+    const editor = CodeMirror.fromTextArea(editorElement, {
+        lineNumbers: true,
+        mode: languageSelect.value,
+        theme: themeSelect.value,
+        matchBrackets: true,
+        lineWrapping: true,
+        foldGutter: true,
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+        lint: true,
+    });
 
-            // Function to update editor mode
-            function updateEditorMode() {
-                const selectedMode = languageSelect.value;
-                editor.setOption("mode", selectedMode);
-                editor.refresh();
-            }
+    languageSelect.addEventListener('change', function () {
+        editor.setOption('mode', languageSelect.value);
+        editor.refresh();
+    });
 
-            // Function to update editor theme
-            function updateEditorTheme() {
-                const selectedTheme = themeSelect.value;
-                editor.setOption("theme", selectedTheme);
-            }
+    themeSelect.addEventListener('change', function () {
+        editor.setOption('theme', themeSelect.value);
+    });
 
-            // Event listeners for language and theme changes
-            languageSelect.addEventListener('change', updateEditorMode);
-            themeSelect.addEventListener('change', updateEditorTheme);
-        });
+    // WebSocket implementation
+    const socket = new WebSocket('ws://localhost:8000/ws/editor/');
 
-        // Register linting helpers for various languages
-        CodeMirror.registerHelper("lint", "javascript", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            const errors = JSHINT.errors;
-            for (let i = 0; i < errors.length; i++) {
-                const error = errors[i];
-                if (error) {
-                    found.push({
-                        from: CodeMirror.Pos(error.line - 1, error.character),
-                        to: CodeMirror.Pos(error.line - 1, error.character + 1),
-                        message: error.reason,
-                    });
-                }
-            }
-            return found;
-        });
+    // Helper function to debounce sending updates
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
 
-        // Other linting helpers for python, html, css, etc., similar to the one for JavaScript
+    // Send updates to WebSocket with a debounce delay (500ms)
+    const sendCodeUpdate = debounce(function (code) {
+        socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
+    }, 500);
 
-        CodeMirror.registerHelper("lint", "python", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your Python linting logic here
-            return found;
-        });
+    socket.onmessage = function (event) {
+        const message = JSON.parse(event.data);
+        console.log('Received WebSocket message:', message);
 
-        CodeMirror.registerHelper("lint", "htmlmixed", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your HTML linting logic here
-            return found;
-        });
+        // Ensure the code is only updated if the content is different
+        if (message.type === 'update' && editor.getValue() !== message.content) {
+            console.log('Updating editor with new content:', message.content);
+            // Set the new content, but avoid sending the change back to the WebSocket server
+            editor.setValue(message.content);
+        }
+    };
 
-        CodeMirror.registerHelper("lint", "css", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your CSS linting logic here
-            return found;
-        });
+    editor.on('change', function () {
+        const code = editor.getValue();
+        console.log('Sending code update to WebSocket:', code);
+        // Debounce code updates to prevent rapid sending
+        sendCodeUpdate(code);
+    });
 
-        CodeMirror.registerHelper("lint", "php", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your PHP linting logic here
-            return found;
-        });
+    socket.onerror = function (error) {
+        console.error('WebSocket Error: ', error);
+    };
 
-        CodeMirror.registerHelper("lint", "ruby", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your Ruby linting logic here
-            return found;
-        });
+    socket.onclose = function (event) {
+        console.log('WebSocket closed: ', event);
+    };
+});
 
-        CodeMirror.registerHelper("lint", "go", function(text) {
-            const found = [];
-            if (text.length === 0) return found;
-            // Add your Go linting logic here
-            return found;
-        });
 
-        const socket = new WebSocket('ws://localhost:8000/ws/editor/'); // Update this URL to your WebSocket endpoint
-
-            socket.onopen = function() {
-                console.log('WebSocket connection established.');
-            };
-
-            socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                if (data.type === 'update') {
-                    editor.setValue(data.content);
-                }
-            };
-
-            // Send updates to the server
-            editor.on('change', function() {
-                const content = editor.getValue();
-                socket.send(JSON.stringify({ type: 'update', content: content }));
-            });
     </script>
 </body>
 </html>
