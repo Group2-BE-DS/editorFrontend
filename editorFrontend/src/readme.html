@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate README</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to your styles -->
+</head>
+<body class="dark:bg-gray-900 h-screen overflow-hidden">
+
+    <!-- Form to capture project title and author name -->
+    <div class="container mx-auto mt-8 p-4 bg-white rounded shadow">
+        <h1 class="text-2xl font-bold mb-4">Generate Project README</h1>
+
+        <!-- Project Title Input -->
+        <div class="mb-4">
+            <label for="projectTitle" class="block text-sm font-medium text-gray-700">Project Title</label>
+            <input type="text" id="projectTitle" class="mt-1 block w-full p-2 border rounded-md" placeholder="Enter your project title">
+        </div>
+
+        <!-- Author Name Input -->
+        <div class="mb-4">
+            <label for="authorName" class="block text-sm font-medium text-gray-700">Author Name</label>
+            <input type="text" id="authorName" class="mt-1 block w-full p-2 border rounded-md" placeholder="Enter the author name">
+        </div>
+
+        <!-- Generate README Button -->
+        <button id="generateReadmeBtn" class="bg-blue-500 text-white p-2 rounded-md">Generate README</button>
+    </div>
+
+    <!-- README Preview Section -->
+    <div id="readmePreview" class="container mx-auto mt-8 p-4 bg-gray-100 rounded shadow">
+        <h2 class="text-xl font-bold mb-4">Generated README Preview</h2>
+        <pre id="readmeOutput" class="whitespace-pre-wrap"></pre> <!-- README content will be displayed here -->
+    </div>
+
+    <!-- Script to capture inputs and handle the generation logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generateReadmeBtn = document.getElementById('generateReadmeBtn');
+            const projectTitle = document.getElementById('projectTitle');
+            const authorName = document.getElementById('authorName');
+            const readmeOutput = document.getElementById('readmeOutput');
+
+            // When the "Generate README" button is clicked
+            generateReadmeBtn.addEventListener('click', () => {
+                const title = projectTitle.value.trim();
+                const author = authorName.value.trim();
+
+                if (!title || !author) {
+                    alert('Please enter both project title and author name.');
+                    return;
+                }
+
+                // Send title, author, and request to the Electron main process
+                ipcRenderer.send('generate-full-readme', { title, author });
+            });
+
+            // Listen for the generated README from the main process
+            ipcRenderer.on('full-readme-generated', (event, readmeContent) => {
+                readmeOutput.textContent = readmeContent; // Display the generated README in the preview
+            });
+        });
+    </script>
+</body>
+</html>
