@@ -3,3 +3,350 @@ body {
     Arial, sans-serif;
   margin: auto;
 }
+<!--div class="p-4 border-2 border-gray-200 border-dashed rounded-lg border-gray-700">-->
+<div class="grid grid-cols-3 gap-4 mb-4">
+   <!--div class="flex items-center justify-center h-24 rounded bg-gray-50 bg-gray-800"-->
+<!--graph1-->
+            <div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+               <div class="flex justify-between">
+                 <div>
+                   <h5 class="leading-none text-xl font-bold text-gray-900 dark:text-white pb-2">32.4k</h5>
+                   <p class="text-xs font-normal text-gray-500 dark:text-gray-400">Users this week</p>
+                 </div>
+                 <div class="flex items-center px-2 py-0.5 text-xs font-semibold text-green-500 dark:text-green-500 text-center">
+                   12%
+                   <svg class="w-2 h-2 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+                   </svg>
+                 </div>
+               </div>
+               <!-- Reduced Height of the Graph Container -->
+               <div id="area-chart" style="height: 180px; padding-top: 10px;">
+                 <canvas id="activityChart" width="400" height="180"></canvas>
+               </div>
+               <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+                 <div class="flex justify-between items-center pt-5">
+                   <button
+                     id="dropdownDefaultButton"
+                     data-dropdown-toggle="lastDaysdropdown"
+                     data-dropdown-placement="bottom"
+                     class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                     type="button">
+                     Last 7 days
+                     <svg class="w-1.5 m-2 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                     </svg>
+                   </button>
+                   <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                       <ul class="py-2 text-xs text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
+                         </li>
+                         <li>
+                           <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
+                         </li>
+                       </ul>
+                   </div>
+                   <a href="#" class="uppercase text-xs font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                     Users Report
+                     <svg class="w-2 h-2 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                     </svg>
+                   </a>
+                 </div>
+               </div>
+             </div>
+
+             
+             
+             <!-- Include Chart.js library -->
+             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+             
+             <!-- Chart.js Script for Enhanced Visibility -->
+             <script>
+                 const ctx = document.getElementById('activityChart').getContext('2d');
+                 const activityChart = new Chart(ctx, {
+                     type: 'line',
+                     data: {
+                         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                         datasets: [{
+                             label: 'Coding Hours',
+                             data: [1, 2, 3, 4, 5, 3, 2],
+                             fill: false,
+                             borderColor: 'rgba(75, 192, 192, 1)',
+                             borderWidth: 4, // Maintain line thickness
+                             pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                             pointBorderColor: '#fff',
+                             pointHoverRadius: 8, // Point size on hover
+                             pointHoverBackgroundColor: 'rgba(75, 192, 192, 1)',
+                             pointHoverBorderColor: 'rgba(220, 220, 220, 1)',
+                             pointRadius: 6, // Base point size
+                             pointBorderWidth: 3 // Point border thickness
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false, // Ensure chart fits the container
+                         plugins: {
+                             legend: {
+                                 display: true,
+                                 position: 'top'
+                             },
+                             tooltip: {
+                                 enabled: true,
+                                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                 titleColor: '#fff',
+                                 bodyColor: '#fff'
+                             }
+                         },
+                         scales: {
+                             x: {
+                                 grid: {
+                                     display: true, // Enable X-axis grid lines
+                                     color: 'rgba(200, 200, 200, 0.2)'
+                                 },
+                                 title: {
+                                     display: true,
+                                     text: 'Days of the Week',
+                                     color: '#666',
+                                     font: {
+                                         size: 12
+                                     }
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     display: true, // Enable Y-axis grid lines
+                                     color: 'rgba(200, 200, 200, 0.2)'
+                                 },
+                                 title: {
+                                     display: true,
+                                     text: 'Hours Spent',
+                                     color: '#666',
+                                     font: {
+                                         size: 12
+                                     }
+                                 },
+                                 min: 0,
+                                 max: 6
+                             }
+                         }
+                     }
+                 });
+             </script>
+
+
+
+
+
+             
+<!--Graph2-->
+
+<div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+   <div class="flex justify-between mb-3">
+       <div class="flex justify-center items-center">
+           <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Languages</h5>
+           <svg data-popover-target="chart-info" data-popover-placement="bottom" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
+           </svg>
+       </div>
+   </div>
+
+   <!-- Devices filter section -->
+   <div>
+       <div class="flex" id="devices">
+           <div class="flex items-center me-4">
+               <input id="desktop" type="checkbox" value="desktop" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+               <label for="desktop" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">HTML</label>
+           </div>
+           <div class="flex items-center me-4">
+               <input id="tablet" type="checkbox" value="tablet" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+               <label for="tablet" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">JSON</label>
+           </div>
+           <div class="flex items-center me-4">
+               <input id="mobile" type="checkbox" value="mobile" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+               <label for="mobile" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">JAVASCRIPT</label>
+           </div>
+       </div>
+   </div>
+
+   <!-- Donut Chart with increased size -->
+   <div class="py-6">
+       <canvas id="pieChart" width="400" height="180"></canvas> <!-- Increased width and height -->
+   </div>
+
+   <!-- Bottom Section -->
+   <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+       <div class="flex justify-between items-center pt-5">
+           <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown" data-dropdown-placement="bottom" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white" type="button">
+               Last 7 days
+               <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+               </svg>
+           </button>
+       </div>
+   </div>
+</div>
+
+<script>
+   // Data for the pie chart
+   const pieData = {
+       labels: ['HTML', 'JSON', 'JAVASCRIPT'],
+       datasets: [{
+           data: [55, 25, 20], // Percentages for traffic sources
+           backgroundColor: ['#377DFF', '#FF6384', '#FFCE56'],
+           hoverBackgroundColor: ['#377DFF', '#FF6384', '#FFCE56'],
+       }]
+   };
+
+   // Config for the pie chart
+   const pieConfig = {
+       type: 'pie',
+       data: pieData,
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,  // Disable maintaining aspect ratio to allow for custom size
+           plugins: {
+               tooltip: {
+                   callbacks: {
+                       label: function(tooltipItem) {
+                           return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                       }
+                   }
+               }
+           }
+       }
+   };
+
+   // Render the chart
+   const pieChart = new Chart(
+       document.getElementById('pieChart'),
+       pieConfig
+   );
+</script>
+
+
+ 
+ 
+
+
+
+
+ <!--Graphhhhhhhhhhhhhhhh3-->
+ <!--div class="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4">
+   <div class="flex justify-between mb-4">
+       <div class="grid gap-4 grid-cols-2">
+           <div>
+               <h5 class="inline-flex items-center text-gray-500 dark:text-gray-400 leading-none font-normal mb-1">Time Spent</h5>
+               <p class="text-gray-900 dark:text-white text-2xl leading-none font-bold">4hr 20mins</p>
+           </div>
+           <div>
+               <!--h5 class="inline-flex items-center text-gray-500 dark:text-gray-400 leading-none font-normal mb-1">CPC</h5>
+               <p class="text-gray-900 dark:text-white text-2xl leading-none font-bold">$5.40</p-->
+           <!--/div>
+       </div>
+       <div>
+           <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown" data-dropdown-placement="bottom" 
+                   type="button" 
+                   class="px-3 py-2 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+               Last week
+               <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+               </svg>
+           </button>
+       </div>
+   </div>
+
+   <!-- Chart container with reduced height -->
+   <div class="py-4" style="height: 250px;">
+       <canvas id="lineChart"></canvas>
+   </div>
+
+   <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-2.5">
+       <div class="pt-4">
+           <a href="#" class="px-4 py-2 text-sm font-medium text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+               <svg class="w-3.5 h-3.5 text-white me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                   <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2Zm-3 15H4.828a1 1 0 0 1 0-2h6.238a1 1 0 0 1 0 2Zm0-4H4.828a1 1 0 0 1 0-2h6.238a1 1 0 1 1 0 2Z"/>
+                   <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
+               </svg>
+               View full report
+           </a>
+       </div>
+   </div>
+</div-->
+
+<!--script>
+   // Data for the line chart
+   const data = {
+       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+       datasets: [{
+           label: 'Time',
+           data: [12000, 15000, 13000, 20000, 22000, 21000, 25000],
+           borderColor: '#377DFF',
+           backgroundColor: 'rgba(55, 125, 255, 0.2)',
+           fill: true,
+           tension: 0.4
+       }]
+   };
+
+   // Config for the line chart with adjusted options
+   const config = {
+       type: 'line',
+       data: data,
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           layout: {
+               padding: {
+                   top: 10,
+                   bottom: 10,
+                   left: 10,
+                   right: 10
+               }
+           },
+           plugins: {
+               legend: {
+                   position: 'top'
+               },
+               tooltip: {
+                   callbacks: {
+                       label: function(context) {
+                           return context.dataset.label + ': ' + context.raw;
+                       }
+                   }
+               }
+           },
+           scales: {
+               x: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Day of the Week'
+                   }
+               },
+               y: {
+                   display: true,
+                   title: {
+                       display: true,
+                       text: 'Time'
+                   }
+               }
+           }
+       }
+   };
+
+   // Render the chart
+   const lineChart = new Chart(
+       document.getElementById('lineChart'),
+       config
+   );
+</script>
