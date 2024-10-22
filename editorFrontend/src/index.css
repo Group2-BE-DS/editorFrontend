@@ -1,5 +1,34 @@
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  margin: auto;
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Prevent body from scrolling */
+}
+
+.wrapper {
+  display: flex;
+  height: 100%; /* Wrapper takes full height */
+}
+
+
+
+.graph-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 110vh; /* Keep the container height constant */
+  padding: 0; /* Remove padding */
+  overflow: hidden; /* Hide scrollbars in the container */
+}
+
+.chart {
+  width: 80%; /* Adjust as needed */
+  height: 400px; /* Fixed height for the chart */
+  margin: 0 auto; /* Ensure that the chart is centered inside the container */
+  overflow-y: auto; /* Enable scrolling for the chart content */
+}
+
+.chart::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
 }
