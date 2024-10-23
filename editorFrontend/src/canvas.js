@@ -1,5 +1,3 @@
-// canvas.js
-
 const CodeMirror = require('codemirror');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/mode/python/python');
@@ -109,4 +107,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize the WebSocket connection
     initializeWebSocket();
+
+    // Add event listener for the Generate README button
+    document.getElementById('generate-readme').addEventListener('click', function() {
+        // Open the README generator URL in a new window
+        window.open('https://readme-ai.streamlit.app/', '_blank');
+    });
 });

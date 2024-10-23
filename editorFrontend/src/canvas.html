@@ -22,6 +22,7 @@
             <ul class="space-y-2 font-medium">
                 <li><a href="index.html" class="text-white">Dashboard</a></li>
                 <li><a href="canvas.html" class="text-white">Public Repository</a></li>
+                <li><button id="generate-readme" class="text-white bg-blue-500 hover:bg-blue-700 rounded-lg px-4 py-2">Generate Readme</button></li>
             </ul>
         </div>
     </aside>
@@ -57,73 +58,74 @@
     const languageSelect = document.getElementById('languageSelect');
     const themeSelect = document.getElementById('themeSelect');
 
-    // Initialize CodeMirror
-    const editor = CodeMirror.fromTextArea(editorElement, {
-        lineNumbers: true,
-        mode: languageSelect.value,
-        theme: themeSelect.value,
-        matchBrackets: true,
-        lineWrapping: true,
-        foldGutter: true,
-        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
-        lint: true,
-    });
+            // Initialize CodeMirror
+            const editor = CodeMirror.fromTextArea(editorElement, {
+                lineNumbers: true,
+                mode: languageSelect.value,
+                theme: themeSelect.value,
+                matchBrackets: true,
+                lineWrapping: true,
+                foldGutter: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+                lint: true,
+            });
 
-    languageSelect.addEventListener('change', function () {
-        editor.setOption('mode', languageSelect.value);
-        editor.refresh();
-    });
+            languageSelect.addEventListener('change', function () {
+                editor.setOption('mode', languageSelect.value);
+                editor.refresh();
+            });
 
-    themeSelect.addEventListener('change', function () {
-        editor.setOption('theme', themeSelect.value);
-    });
+            themeSelect.addEventListener('change', function () {
+                editor.setOption('theme', themeSelect.value);
+            });
 
-    // WebSocket implementation
-    const socket = new WebSocket('ws://localhost:8000/ws/editor/');
+            // Add event listener for the Generate README button
+            document.getElementById('generate-readme').addEventListener('click', function() {
+                window.open('https://readme-ai.streamlit.app/', '_blank');
+            });
 
-    // Helper function to debounce sending updates
-    function debounce(func, delay) {
-        let timer;
-        return function (...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
+            // WebSocket implementation
+            const socket = new WebSocket('ws://localhost:8000/ws/editor/');
 
-    // Send updates to WebSocket with a debounce delay (500ms)
-    const sendCodeUpdate = debounce(function (code) {
-        socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
-    }, 500);
+            // Helper function to debounce sending updates
+            function debounce(func, delay) {
+                let timer;
+                return function (...args) {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
 
-    socket.onmessage = function (event) {
-        const message = JSON.parse(event.data);
-        console.log('Received WebSocket message:', message);
+            // Send updates to WebSocket with a debounce delay (500ms)
+            const sendCodeUpdate = debounce(function (code) {
+                socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
+            }, 500);
 
-        // Ensure the code is only updated if the content is different
-        if (message.type === 'update' && editor.getValue() !== message.content) {
-            console.log('Updating editor with new content:', message.content);
-            // Set the new content, but avoid sending the change back to the WebSocket server
-            editor.setValue(message.content);
-        }
-    };
+            socket.onmessage = function (event) {
+                const message = JSON.parse(event.data);
+                console.log('Received WebSocket message:', message);
 
-    editor.on('change', function () {
-        const code = editor.getValue();
-        console.log('Sending code update to WebSocket:', code);
-        // Debounce code updates to prevent rapid sending
-        sendCodeUpdate(code);
-    });
+                // Ensure the code is only updated if the content is different
+                if (message.type === 'update' && editor.getValue() !== message.content) {
+                    console.log('Updating editor with new content:', message.content);
+                    editor.setValue(message.content);
+                }
+            };
 
-    socket.onerror = function (error) {
-        console.error('WebSocket Error: ', error);
-    };
+            editor.on('change', function () {
+                const code = editor.getValue();
+                console.log('Sending code update to WebSocket:', code);
+                sendCodeUpdate(code);
+            });
 
-    socket.onclose = function (event) {
-        console.log('WebSocket closed: ', event);
-    };
-});
+            socket.onerror = function (error) {
+                console.error('WebSocket Error: ', error);
+            };
 
-
+            socket.onclose = function (event) {
+                console.log('WebSocket closed: ', event);
+            };
+        });
     </script>
 </body>
 </html>
