@@ -1,34 +1,28 @@
 html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  margin: 0;
+  margin: 0; /* Remove margin */
   padding: 0;
-  min-height: 100vh; /* Full viewport height */
-  overflow: hidden; /* Prevent body from scrolling */
+  min-height: 150vh; /* Ensure the body takes at least full viewport height */
+  overflow-y: scroll; /* Allow scrolling */
 }
 
-.wrapper {
-  display: flex;
-  height: 100%; /* Wrapper takes full height */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* Make scrollbar transparent */
 }
-
-
 
 .graph-container {
   display: flex;
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   height: 110vh; /* Keep the container height constant */
-  padding: 0; /* Remove padding */
-  overflow: hidden; /* Hide scrollbars in the container */
+  margin-left: 30vh;
+  padding-top: 150px; /* Add more top padding to account for fixed navbar */
+  overflow-y: auto; /* Enable scrolling within the graph container */
 }
 
 .chart {
   width: 80%; /* Adjust as needed */
+  margin: 150px auto 0 auto; /* Increased top margin to shift the chart further down */
   height: 400px; /* Fixed height for the chart */
-  margin: 0 auto; /* Ensure that the chart is centered inside the container */
-  overflow-y: auto; /* Enable scrolling for the chart content */
-}
-
-.chart::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Edge */
 }
