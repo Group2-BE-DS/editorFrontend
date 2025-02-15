@@ -126,6 +126,28 @@
             border-color: #4a5568;
         }
 
+        /* Light mode sidebar */
+        html:not(.dark) #sidebar-multi-level-sidebar {
+            background-color: #f8f9fa;
+            color: #1a1a1a;
+        }
+
+        html:not(.dark) #sidebar-multi-level-sidebar .text-white {
+            color: #1a1a1a;
+        }
+
+        html:not(.dark) #sidebar-multi-level-sidebar .hover\:bg-gray-700:hover {
+            background-color: #e2e8f0;
+        }
+
+        html:not(.dark) #sidebar-multi-level-sidebar .bg-gray-800 {
+            background-color: #f8f9fa;
+        }
+
+        html:not(.dark) #sidebar-multi-level-sidebar .border-gray-700 {
+            border-color: #e2e8f0;
+        }
+
         /* Folder collapse styles */
         .folder-content {
             max-height: 0;
@@ -167,6 +189,16 @@
             background-color: #ef4444;
             color: white;
         }
+
+        /* App title styles */
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -180,6 +212,10 @@
         class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-800 flex flex-col">
+            <!-- App Title -->
+            <div class="app-title text-white border-gray-700">
+                C.C.C
+            </div>
             <!-- File Operations -->
             <div class="flex gap-2 mb-4 p-2 border-b border-gray-700">
                 <div class="tooltip">
@@ -279,6 +315,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </aside>
 
     <!-- Settings Modal -->
