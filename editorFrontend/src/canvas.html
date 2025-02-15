@@ -7,43 +7,175 @@
     <link rel="stylesheet" href="../node_modules/flowbite/dist/flowbite.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .CodeMirror {
             height: 90vh;
             border: 1px solid #ddd;
             border-radius: 0.5rem;
         }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .file-tree {
+            margin-left: 1rem;
+        }
+        .file-item, .folder-item {
+            padding: 0.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .file-item:hover, .folder-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body class="dark:bg-gray-900 h-screen overflow-hidden">
     <!-- Sidebar -->
     <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 bg-gray-800">
-            <ul class="space-y-2 font-medium">
-                <li><a href="index.html" class="text-white">Dashboard</a></li>
-                <li><a href="canvas.html" class="text-white">Public Repository</a></li>
-                <li><button id="generate-readme" class="text-white bg-blue-500 hover:bg-blue-700 rounded-lg px-4 py-2">Generate Readme</button></li>
-            </ul>
+        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-800 flex flex-col">
+            <!-- File Operations -->
+            <div class="flex gap-2 mb-4 p-2 border-b border-gray-700">
+                <div class="tooltip">
+                    <button class="text-white hover:bg-gray-700 p-2 rounded">
+                        <i class="fas fa-file-plus"></i>
+                    </button>
+                    <span class="tooltiptext">Create New File</span>
+                </div>
+                <div class="tooltip">
+                    <button class="text-white hover:bg-gray-700 p-2 rounded">
+                        <i class="fas fa-folder-plus"></i>
+                    </button>
+                    <span class="tooltiptext">Create New Folder</span>
+                </div>
+                <div class="tooltip ml-auto">
+                    <button id="settingsButton" class="text-white hover:bg-gray-700 p-2 rounded">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <span class="tooltiptext">Settings</span>
+                </div>
+            </div>
+
+            <!-- File Tree -->
+            <div class="flex-1 overflow-y-auto text-white">
+                <div class="file-tree">
+                    <div class="folder-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>src</span>
+                    </div>
+                    <div class="file-tree">
+                        <div class="file-item">
+                            <i class="fas fa-file-code"></i>
+                            <span>index.html</span>
+                        </div>
+                        <div class="file-item">
+                            <i class="fas fa-file-code"></i>
+                            <span>styles.css</span>
+                        </div>
+                    </div>
+                    <div class="folder-item">
+                        <i class="fas fa-folder"></i>
+                        <span>public</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="mt-auto border-t border-gray-700 pt-4">
+                <div class="tooltip w-full">
+                    <button class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-code"></i>
+                        <span>Generate Code</span>
+                    </button>
+                    <span class="tooltiptext">AI-powered code generation</span>
+                </div>
+                <div class="tooltip w-full">
+                    <button class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Generate Docs</span>
+                    </button>
+                    <span class="tooltiptext">Auto-generate documentation</span>
+                </div>
+                <div class="tooltip w-full">
+                    <button class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Auto-commit</span>
+                    </button>
+                    <span class="tooltiptext">Automatically commit changes</span>
+                </div>
+            </div>
         </div>
     </aside>
 
-    <div class="p-4 sm:ml-64">
-        <div class="flex space-x-4 mb-4">
-            <select id="languageSelect" class="block w-full p-2 border rounded-lg">
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="htmlmixed">HTML</option>
-                <option value="css">CSS</option>
-                <option value="php">PHP</option>
-                <option value="ruby">Ruby</option>
-                <option value="go">Go</option>
-            </select>
-            <select id="themeSelect" class="block w-full p-2 border rounded-lg">
-                <option value="dracula">Dracula</option>
-                <option value="default">Default</option>
-            </select>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-800">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-white">Editor Settings</h3>
+                <div class="mt-4 text-left">
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2">Language</label>
+                        <select id="languageSelect" class="w-full p-2 border rounded-lg bg-gray-700 text-white">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="htmlmixed">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="go">Go</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2">Theme</label>
+                        <select id="themeSelect" class="w-full p-2 border rounded-lg bg-gray-700 text-white">
+                            <option value="dracula">Dracula</option>
+                            <option value="default">Default</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2">Appearance</label>
+                        <div class="flex items-center">
+                            <span class="text-white mr-2">Light</span>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="text-white ml-2">Dark</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="closeSettings" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Close</button>
+                </div>
+            </div>
         </div>
+    </div>
 
+    <div class="p-4 sm:ml-64">
         <textarea id="editor" placeholder="Start typing your code..."></textarea>
     </div>
 
@@ -53,10 +185,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.4/jshint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
     <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const editorElement = document.getElementById('editor');
-    const languageSelect = document.getElementById('languageSelect');
-    const themeSelect = document.getElementById('themeSelect');
+        document.addEventListener('DOMContentLoaded', function () {
+            const editorElement = document.getElementById('editor');
+            const languageSelect = document.getElementById('languageSelect');
+            const themeSelect = document.getElementById('themeSelect');
+            const settingsButton = document.getElementById('settingsButton');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettings = document.getElementById('closeSettings');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
+            // Settings Modal
+            settingsButton.addEventListener('click', () => {
+                settingsModal.classList.remove('hidden');
+            });
+
+            closeSettings.addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+
+            // Dark Mode Toggle
+            darkModeToggle.addEventListener('change', function() {
+                document.body.classList.toggle('dark', this.checked);
+            });
 
             // Initialize CodeMirror
             const editor = CodeMirror.fromTextArea(editorElement, {
@@ -79,15 +229,9 @@
                 editor.setOption('theme', themeSelect.value);
             });
 
-            // Add event listener for the Generate README button
-            document.getElementById('generate-readme').addEventListener('click', function() {
-                window.open('https://readme-ai.streamlit.app/', '_blank');
-            });
-
             // WebSocket implementation
             const socket = new WebSocket('ws://localhost:8000/ws/editor/');
 
-            // Helper function to debounce sending updates
             function debounce(func, delay) {
                 let timer;
                 return function (...args) {
@@ -96,7 +240,6 @@
                 };
             }
 
-            // Send updates to WebSocket with a debounce delay (500ms)
             const sendCodeUpdate = debounce(function (code) {
                 socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
             }, 500);
@@ -104,8 +247,6 @@
             socket.onmessage = function (event) {
                 const message = JSON.parse(event.data);
                 console.log('Received WebSocket message:', message);
-
-                // Ensure the code is only updated if the content is different
                 if (message.type === 'update' && editor.getValue() !== message.content) {
                     console.log('Updating editor with new content:', message.content);
                     editor.setValue(message.content);
