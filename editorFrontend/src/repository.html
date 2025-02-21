@@ -6,6 +6,7 @@
     <title>C.C.C Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     <script>
         // Check for saved theme preference or system preference
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -33,260 +34,396 @@
 </head>
 <body class="dark:bg-gray-900 h-screen overflow-hidden">
   <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <a href="index.html" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-white">C.C.C</span>
-            </a>
-            
-            <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <!-- Theme Toggle Button -->
-                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 mx-2">
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                    </svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
-                    </svg>
-                </button>
-                
-                <!-- Profile Dropdown -->
-                <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
-                    <span class="sr-only">Open user menu</span>
-                    <img class="w-8 h-8 rounded-full" src="/api/placeholder/32/32" alt="user photo">
-                </button>
-                <!-- Dropdown menu -->
-                <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
-                    <div class="px-4 py-3">
-                        <span class="block text-sm text-gray-900 dark:text-white">User Name</span>
-                        <span class="block text-sm text-gray-500 truncate dark:text-gray-400">user@email.com</span>
-                    </div>
-                    <ul class="py-2" aria-labelledby="user-menu-button">
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profile</a>
-                        </li>
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>
-                        </li>
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+  <nav class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="index.html" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-white">C.C.C</span>
+      </a>
+      
+      <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 mx-2">
+          <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+          </svg>
+          <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+          </svg>
+        </button>
+        
+        <!-- Profile Dropdown Button -->
+        <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
+          <span class="sr-only">Open user menu</span>
+          <img id="user-avatar" class="w-8 h-8 rounded-full" src="/api/placeholder/32/32" alt="user photo">
+        </button>
+        <!-- Dropdown menu -->
+        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
+          <div class="px-4 py-3">
+            <span id="user-name" class="block text-sm text-gray-900 dark:text-white">Loading...</span>
+            <span id="user-email" class="block text-sm text-gray-500 truncate dark:text-gray-400">Loading...</span>
+          </div>
+          <ul class="py-2" aria-labelledby="user-menu-button">
+            <li>
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Profile</a>
+            </li>
+            <li>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>
+            </li>
+            <li>
+              <button onclick="logout()" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</button>
+            </li>
+          </ul>
         </div>
-    </nav>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Sidebar -->
-    <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-            <ul class="space-y-2 font-medium">
-                <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
-                            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
-                        </svg>
-                        <span class="ms-3">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="repository.html" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M11 4.717c-2.286-.58-4.16-.756-7.045-.71A1.99 1.99 0 0 0 2 6v11c0 1.133.934 2.022 2.044 2.007 2.759-.038 4.5.16 6.956.791V4.717Zm2 15.081c2.456-.631 4.198-.829 6.956-.791A2.013 2.013 0 0 0 22 16.999V6a1.99 1.99 0 0 0-1.955-1.993c-2.885-.046-4.76.13-7.045.71v15.081Z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="ms-3">Public Repository</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="ms-3">Private Repository</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M5 6a3 3 0 1 1 4 2.83V10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V8.83a3.001 3.001 0 1 1 2 0V10a3 3 0 0 1-3 3h-1v2.17a3.001 3.001 0 1 1-2 0V13h-1a3 3 0 0 1-3-3V8.83A3.001 3.001 0 0 1 5 6Z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="ms-3">Forked Repository</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10c0 5.5-4.44 9.963-9.932 10h-.138C6.438 21.962 2 17.5 2 12Zm10-5c-1.84 0-3.333 1.455-3.333 3.25S10.159 13.5 12 13.5c1.84 0 3.333-1.455 3.333-3.25S13.841 7 12 7Z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="ms-3">Other's Repository</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside>
+  <!-- Sidebar -->
+  <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+      <ul class="space-y-2 font-medium">
+        <li>
+          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+              <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+              <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
+            </svg>
+            <span class="ms-3">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="repository.html" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M11 4.717c-2.286-.58-4.16-.756-7.045-.71A1.99 1.99 0 0 0 2 6v11c0 1.133.934 2.022 2.044 2.007 2.759-.038 4.5.16 6.956.791V4.717Zm2 15.081c2.456-.631 4.198-.829 6.956-.791A2.013 2.013 0 0 0 22 16.999V6a1.99 1.99 0 0 0-1.955-1.993c-2.885-.046-4.76.13-7.045.71v15.081Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="ms-3">Public Repository</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="ms-3">Private Repository</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M5 6a3 3 0 1 1 4 2.83V10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V8.83a3.001 3.001 0 1 1 2 0V10a3 3 0 0 1-3 3h-1v2.17a3.001 3.001 0 1 1-2 0V13h-1a3 3 0 0 1-3-3V8.83A3.001 3.001 0 0 1 5 6Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="ms-3">Forked Repository</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10c0 5.5-4.44 9.963-9.932 10h-.138C6.438 21.962 2 17.5 2 12Zm10-5c-1.84 0-3.333 1.455-3.333 3.25S10.159 13.5 12 13.5c1.84 0 3.333-1.455 3.333-3.25S13.841 7 12 7Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="ms-3">Other's Repository</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </aside>
 
-    <!-- Main Content -->
-    <div class="graph-container">
-      <!-- Navbar -->
-      <div class="bg-gray-800 p-4 rounded-md mb-6">
-        <div class="flex justify-between items-center">
-          <div class="text-xl font-semibold">My Repositories</div>
+  <!-- Main Content -->
+  <div class="graph-container">
+    <!-- Navbar -->
+    <div class="bg-gray-800 p-4 rounded-md mb-6">
+      <div class="flex justify-between items-center">
+        <div class="text-xl font-semibold">My Repositories</div>
+      </div>
+    </div>
+
+    <!-- Repository Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
+      <!-- Example Repository Card (will be dynamically added) -->
+      <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg hidden" id="repoCardTemplate">
+        <h3 class="text-xl font-semibold" id="repoName"></h3>
+        <p class="text-gray-400" id="repoDescription"></p>
+        <div class="mt-4 flex justify-between items-center">
+          <a href="#" class="text-blue-500 hover:underline">View Details</a>
+          <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
         </div>
       </div>
-    
-      <!-- Repository Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
-        <!-- Example Repository Card (will be dynamically added) -->
-        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg hidden" id="repoCardTemplate">
-          <h3 class="text-xl font-semibold" id="repoName"></h3>
-          <p class="text-gray-400" id="repoDescription"></p>
-          <div class="mt-4 flex justify-between items-center">
-            <a href="#" class="text-blue-500 hover:underline">View Details</a>
-            <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
-          </div>
+
+      <!-- New Repository Card (Create New Repository) -->
+      <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700" id="createRepoCard">
+        <div class="flex justify-center items-center h-full">
+          <div class="text-2xl text-gray-400">+</div>
         </div>
-    
-        <!-- New Repository Card (Create New Repository) -->
-        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700" id="createRepoCard">
-          <div class="flex justify-center items-center h-full">
-            <div class="text-2xl text-gray-400">+</div>
-          </div>
-          <p class="text-center text-gray-400 mt-4">Create New Repository</p>
+        <p class="text-center text-gray-400 mt-4">Create New Repository</p>
+      </div>
+    </div>
+
+    <!-- New Repository Form (Hidden initially) -->
+    <div id="createRepoForm" class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6 hidden">
+      <h3 class="text-xl font-semibold mb-4">Create New Repository</h3>
+      <form id="repositoryForm">
+        <div class="mb-4">
+          <label for="repoNameInput" class="block text-gray-400">Repository Name</label>
+          <input type="text" id="repoNameInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository name" required />
         </div>
-      </div>
-    
-      <!-- New Repository Form (Hidden initially) -->
-      <div id="createRepoForm" class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6 hidden">
-        <h3 class="text-xl font-semibold mb-4">Create New Repository</h3>
-        <form id="repositoryForm">
-          <div class="mb-4">
-            <label for="repoNameInput" class="block text-gray-400">Repository Name</label>
-            <input type="text" id="repoNameInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository name" required />
-          </div>
-          <div class="mb-4">
-            <label for="repoDescriptionInput" class="block text-gray-400">Description</label>
-            <textarea id="repoDescriptionInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository description"></textarea>
-          </div>
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Create Repository</button>
-        </form>
-        <button id="cancelCreateRepo" class="mt-4 text-gray-400 hover:text-white w-full">Cancel</button>
-      </div>
+        <div class="mb-4">
+          <label for="repoDescriptionInput" class="block text-gray-400">Description</label>
+          <textarea id="repoDescriptionInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository description"></textarea>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Create Repository</button>
+      </form>
+      <button id="cancelCreateRepo" class="mt-4 text-gray-400 hover:text-white w-full">Cancel</button>
     </div>
   </div>
 
   <script>
+    // Theme toggle logic
+    var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    // Change the icons inside the button based on previous settings
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      themeToggleLightIcon.classList.remove('hidden');
+    } else {
+      themeToggleDarkIcon.classList.remove('hidden');
+    }
 
-        // Change the icons inside the button based on previous settings
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            themeToggleLightIcon.classList.remove('hidden');
+    var themeToggleBtn = document.getElementById('theme-toggle');
+
+    themeToggleBtn.addEventListener('click', function () {
+      // Toggle icons
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+
+      // If is set in localStorage
+      if (localStorage.getItem('color-theme')) {
+        if (localStorage.getItem('color-theme') === 'light') {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
         } else {
-            themeToggleDarkIcon.classList.remove('hidden');
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
         }
+      } else {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
+        }
+      }
+    });
 
-        var themeToggleBtn = document.getElementById('theme-toggle');
-
-        themeToggleBtn.addEventListener('click', function() {
-            // Toggle icons
-            themeToggleDarkIcon.classList.toggle('hidden');
-            themeToggleLightIcon.classList.toggle('hidden');
-
-            // If is set in localStorage
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                }
-            } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
-            }
-            
-            // Reload charts with new theme
+    // Function to fetch repositories from the backend
+    const fetchRepositories = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/fs/repositories/', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token
+          },
         });
 
+        if (!response.ok) {
+          throw new Error('Failed to fetch repositories');
+        }
 
-    
-    // Example repository data (replace this with actual data from the backend)
-    const repositories = [
-      { name: "Repository 1", description: "This is a description of repository 1." },
-      { name: "Repository 2", description: "This is a description of repository 2." },
-      { name: "Repository 3", description: "This is a description of repository 3." }
-    ];
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching repositories:', error);
+        return [];
+      }
+    };
 
-    // Function to handle logout
-    
-    // Function to handle repository card creation dynamically
-    const createRepositoryCard = (repo) => {
-      const template = document.getElementById("repoCardTemplate");
-      const newCard = template.cloneNode(true);
-      newCard.classList.remove("hidden");
-      newCard.querySelector("#repoName").innerText = repo.name;
-      newCard.querySelector("#repoDescription").innerText = repo.description;
-      document.getElementById("repositoryCards").appendChild(newCard);
+    // Function to get CSRF token from cookies
+    const getCookie = (name) => {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    };
+
+    // Function to create a new repository
+    const createRepository = async (name, description) => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/fs/repositories/', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token
+          },
+          body: JSON.stringify({ name, description }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create repository');
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error creating repository:', error);
+        return null;
+      }
+    };
+
+    // Function to delete a repository
+    const deleteRepository = async (id) => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${id}/`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete repository');
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error deleting repository:', error);
+        return false;
+      }
+    };
+
+    // Function to render repository cards
+    const renderRepositoryCards = (repositories) => {
+      const repositoryCardsContainer = document.getElementById('repositoryCards');
+      const template = document.getElementById('repoCardTemplate');
+      const createRepoCard = document.getElementById('createRepoCard');
+
+      if (!repositoryCardsContainer || !template || !createRepoCard) {
+        console.error('Required elements not found in the DOM');
+        return;
+      }
+
+      // Clear existing cards (except the template and create card)
+      repositoryCardsContainer.innerHTML = '';
+      repositoryCardsContainer.appendChild(createRepoCard);
+
+      repositories.forEach((repo) => {
+        const newCard = template.cloneNode(true);
+        newCard.classList.remove('hidden');
+        newCard.querySelector('#repoName').innerText = repo.name;
+        newCard.querySelector('#repoDescription').innerText = repo.description;
+        newCard.querySelector('a[onclick="deleteRepository(event)"]').setAttribute('data-repo-id', repo.id);
+        repositoryCardsContainer.appendChild(newCard);
+      });
+    };
+
+    // Function to handle form submission
+    const handleFormSubmission = async (event) => {
+      event.preventDefault();
+      const repoName = document.getElementById('repoNameInput').value;
+      const repoDescription = document.getElementById('repoDescriptionInput').value;
+
+      if (!repoName) {
+        alert('Repository name is required');
+        return;
+      }
+
+      const newRepo = await createRepository(repoName, repoDescription);
+      if (newRepo) {
+        // Refresh the repository list
+        const repositories = await fetchRepositories();
+        renderRepositoryCards(repositories);
+
+        // Reset form and hide it
+        document.getElementById('repositoryForm').reset();
+        cancelCreateRepository();
+        alert('Repository created successfully!');
+      } else {
+        alert('Failed to create repository');
+      }
+    };
+
+    // Function to handle repository deletion
+    const handleDeleteRepository = async (event) => {
+      event.preventDefault();
+      const repoId = event.target.getAttribute('data-repo-id');
+
+      if (confirm('Are you sure you want to delete this repository?')) {
+        const success = await deleteRepository(repoId);
+        if (success) {
+          // Refresh the repository list
+          const repositories = await fetchRepositories();
+          renderRepositoryCards(repositories);
+          alert('Repository deleted successfully!');
+        } else {
+          alert('Failed to delete repository');
+        }
+      }
     };
 
     // Function to handle "Create New Repository" card click
     const createNewRepository = () => {
-      document.getElementById("createRepoCard").classList.add("hidden");
-      document.getElementById("createRepoForm").classList.remove("hidden");
+      document.getElementById('createRepoCard').classList.add('hidden');
+      document.getElementById('createRepoForm').classList.remove('hidden');
     };
 
     // Function to handle form cancellation
     const cancelCreateRepository = () => {
-      document.getElementById("createRepoCard").classList.remove("hidden");
-      document.getElementById("createRepoForm").classList.add("hidden");
+      document.getElementById('createRepoCard').classList.remove('hidden');
+      document.getElementById('createRepoForm').classList.add('hidden');
     };
 
-    // Function to handle form submission
-    const handleFormSubmission = (event) => {
-      event.preventDefault();
-      const repoName = document.getElementById("repoNameInput").value;
-      const repoDescription = document.getElementById("repoDescriptionInput").value;
+    // Logout function
+    const logout = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token
+          },
+        });
 
-      // Simulate repository creation
-      const newRepo = { name: repoName, description: repoDescription };
-      repositories.push(newRepo);
-      createRepositoryCard(newRepo); // Dynamically add the new repository card
-
-      // Reset form and hide it
-      document.getElementById("repositoryForm").reset();
-      cancelCreateRepository();
-      alert("Repository created successfully!");
+        if (response.ok) {
+          localStorage.removeItem('authToken');
+          window.location.href = 'login.html';
+        } else {
+          console.error('Logout failed');
+        }
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
     };
 
-    // Function to delete repository (simulated)
-    const deleteRepository = (event) => {
-      const repoCard = event.target.closest('.max-w-xs');
-      repoCard.remove();
-      alert("Repository deleted.");
-      // Implement actual deletion logic (e.g., call to backend API to delete repository)
-    };
+    // Attach event listeners
+    document.getElementById('createRepoCard').addEventListener('click', createNewRepository);
+    document.getElementById('repositoryForm').addEventListener('submit', handleFormSubmission);
+    document.getElementById('cancelCreateRepo').addEventListener('click', cancelCreateRepository);
+    document.addEventListener('click', (event) => {
+      if (event.target.getAttribute('onclick') === 'deleteRepository(event)') {
+        handleDeleteRepository(event);
+      }
+    });
 
-    // Attach event listener to "Create New Repository" card
-    document.getElementById("createRepoCard").addEventListener('click', createNewRepository);
-
-    // Attach event listener to form submission
-    document.getElementById("repositoryForm").addEventListener('submit', handleFormSubmission);
-
-    // Attach event listener to cancel button
-    document.getElementById("cancelCreateRepo").addEventListener('click', cancelCreateRepository);
-
-    // Simulate loading repositories on page load
-    window.onload = () => {
-      repositories.forEach(createRepositoryCard); // Create cards for each repository
-      document.getElementById("logoutButton").addEventListener('click', logout); // Add logout event
+    // Load repositories on page load
+    window.onload = async () => {
+      try {
+        const repositories = await fetchRepositories();
+        renderRepositoryCards(repositories);
+      } catch (error) {
+        console.error('Error loading repositories:', error);
+      }
     };
   </script>
 </body>
