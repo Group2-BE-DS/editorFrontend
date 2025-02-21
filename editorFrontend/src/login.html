@@ -9,7 +9,6 @@
   <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.css" rel="stylesheet" />
   <style>
-    /* Automatically apply dark mode if preferred */
     body {
       transition: background-color 0.3s, color 0.3s;
     }
@@ -31,31 +30,29 @@
 
   <div class="h-screen flex items-center justify-center">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-
-      <!-- C.C.C App Name -->
       <div class="text-center mb-6">
         <h1 class="text-4xl font-semibold text-blue-600 dark:text-blue-500">C.C.C</h1>
-        <p class="text-xl text-gray-500 dark:text-gray-400">Welcome back to C.C.C. Please login to your account.</p>
+        <p class="text-xl text-gray-500 dark:text-gray-400">Welcome back! Please login to your account.</p>
       </div>
 
+      <!-- Error Message -->
+      <div id="error-message" class="hidden text-red-500 text-sm mb-4"></div>
+
       <!-- Login Form -->
-      <form action="#" method="POST">
+      <form id="login-form">
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-medium">Username</label>
+          <input type="text" id="username" name="username" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your username" required>
+        </div>
+
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium">Email Address</label>
-          <input type="email" id="email" name="email" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter your email" required>
+          <input type="email" id="email" name="email" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your email" required>
         </div>
 
         <div class="mb-6">
           <label for="password" class="block text-sm font-medium">Password</label>
-          <input type="password" id="password" name="password" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter your password" required>
-        </div>
-
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center">
-            <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:text-blue-500">
-            <label for="remember" class="ml-2 block text-sm">Remember Me</label>
-          </div>
-          <a href="#" class="text-sm text-blue-600 hover:text-blue-500">Forgot Password?</a>
+          <input type="password" id="password" name="password" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your password" required>
         </div>
 
         <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Login</button>
@@ -68,14 +65,49 @@
   </div>
 
   <script>
-    const toggleButton = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
+    // Redirect if already logged in
+    if (localStorage.getItem("authToken")) {
+      window.location.href = "index.html";
+    }
 
-    toggleButton.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      sunIcon.classList.toggle('hidden');
-      moonIcon.classList.toggle('hidden');
+    // Theme toggle functionality
+    const toggleButton = document.getElementById("theme-toggle");
+    const sunIcon = document.getElementById("sun-icon");
+    const moonIcon = document.getElementById("moon-icon");
+
+    toggleButton.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+      sunIcon.classList.toggle("hidden");
+      moonIcon.classList.toggle("hidden");
+    });
+
+    // Login handling
+    document.getElementById("login-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorMessage = document.getElementById("error-message");
+
+      const response = await fetch("http://127.0.0.1:8000/auth/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("authToken", data.key); // Store the received token
+        alert("Login successful!");
+        window.location.href = "index.html"; // Redirect to index.html
+      } else {
+        const errorData = await response.json();
+        errorMessage.textContent = errorData.non_field_errors
+          ? errorData.non_field_errors[0]
+          : "Invalid login credentials.";
+        errorMessage.classList.remove("hidden");
+      }
     });
   </script>
 
