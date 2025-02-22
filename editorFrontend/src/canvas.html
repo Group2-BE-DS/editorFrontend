@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Your existing styles */
         .CodeMirror {
             height: 90vh;
             border: 1px solid #ddd;
@@ -199,6 +200,15 @@
             border-bottom: 1px solid;
             margin-bottom: 1rem;
         }
+
+        /* Repository name styles */
+        .repo-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -219,13 +229,13 @@
             <!-- File Operations -->
             <div class="flex gap-2 mb-4 p-2 border-b border-gray-700">
                 <div class="tooltip">
-                    <button class="text-white hover:bg-gray-700 p-2 rounded">
+                    <button id="createFileBtn" class="text-white hover:bg-gray-700 p-2 rounded">
                         <i class="fas fa-file-plus"></i>
                     </button>
                     <span class="tooltiptext">Create New File</span>
                 </div>
                 <div class="tooltip">
-                    <button class="text-white hover:bg-gray-700 p-2 rounded">
+                    <button id="createFolderBtn" class="text-white hover:bg-gray-700 p-2 rounded">
                         <i class="fas fa-folder-plus"></i>
                     </button>
                     <span class="tooltiptext">Create New Folder</span>
@@ -238,81 +248,51 @@
                 </div>
             </div>
 
-            <!-- File Tree -->
-            <div class="flex-1 overflow-y-auto text-white">
-                <div class="file-tree">
-                    <div class="folder-item" data-folder="src">
-                        <div class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-700 rounded">
-                            <i class="fas fa-chevron-right text-xs"></i>
-                            <i class="fas fa-folder"></i>
-                            <span>src</span>
-                        </div>
-                        <div class="folder-content ml-4">
-                            <div class="file-item p-2 hover:bg-gray-700 rounded">
-                                <i class="fas fa-file-code"></i>
-                                <span>index.html</span>
-                            </div>
-                            <div class="file-item p-2 hover:bg-gray-700 rounded">
-                                <i class="fas fa-file-code"></i>
-                                <span>styles.css</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="folder-item" data-folder="public">
-                        <div class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-700 rounded">
-                            <i class="fas fa-chevron-right text-xs"></i>
-                            <i class="fas fa-folder"></i>
-                            <span>public</span>
-                        </div>
-                        <div class="folder-content ml-4">
-                            <div class="folder-item" data-folder="assets">
-                                <div class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-700 rounded">
-                                    <i class="fas fa-chevron-right text-xs"></i>
-                                    <i class="fas fa-folder"></i>
-                                    <span>assets</span>
-                                </div>
-                                <div class="folder-content ml-4">
-                                    <!-- Assets folder content -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Repository Name -->
+            <div id="repoName" class="repo-name text-white">
+                Loading repository...
+            </div>
 
-                <!-- Bottom Actions -->
-                <div class="mt-auto border-t border-gray-700 pt-4">
-                    <div class="tooltip w-full">
-                        <button id="shareCodeBtn"
-                            class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
-                            <i class="fas fa-users"></i>
-                            <span>Share Code</span>
-                        </button>
-                        <span class="tooltiptext">Enable collaborative coding</span>
-                    </div>
-                    <div class="tooltip w-full">
-                        <button
-                            class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
-                            <i class="fas fa-code"></i>
-                            <span>Generate Code</span>
-                        </button>
-                        <span class="tooltiptext">AI-powered code generation</span>
-                    </div>
-                    <div class="tooltip w-full">
-                        <button
-                            class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Generate Docs</span>
-                        </button>
-                        <span class="tooltiptext">Auto-generate documentation</span>
-                    </div>
-                    <div class="tooltip w-full">
-                        <button
-                            class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
-                            <i class="fas fa-code-branch"></i>
-                            <span>Auto-commit</span>
-                        </button>
-                        <span class="tooltiptext">Automatically commit changes</span>
-                    </div>
+            <!-- File Tree -->
+            <div class="flex-1 overflow-y-auto text-white" id="fileTree">
+                <div class="file-tree">
+                    <!-- Dynamic file tree will be populated here -->
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="mt-auto border-t border-gray-700 pt-4">
+                <div class="tooltip w-full">
+                    <button id="shareCodeBtn"
+                        class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-users"></i>
+                        <span>Share Code</span>
+                    </button>
+                    <span class="tooltiptext">Enable collaborative coding</span>
+                </div>
+                <div class="tooltip w-full">
+                    <button
+                        class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-code"></i>
+                        <span>Generate Code</span>
+                    </button>
+                    <span class="tooltiptext">AI-powered code generation</span>
+                </div>
+                <div class="tooltip w-full">
+                    <button
+                        class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Generate Docs</span>
+                    </button>
+                    <span class="tooltiptext">Auto-generate documentation</span>
+                </div>
+                <div class="tooltip w-full">
+                    <button
+                        class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Auto-commit</span>
+                    </button>
+                    <span class="tooltiptext">Automatically commit changes</span>
                 </div>
             </div>
         </div>
@@ -383,8 +363,45 @@
             const darkModeToggle = document.getElementById('darkModeToggle');
             const shareCodeBtn = document.getElementById('shareCodeBtn');
             const connectionStatus = document.getElementById('connectionStatus');
+            const createFileBtn = document.getElementById('createFileBtn');
+            const createFolderBtn = document.getElementById('createFolderBtn');
+            const fileTree = document.getElementById('fileTree');
+            const repoNameElement = document.getElementById('repoName');
             let socket = null;
             let isCollaborating = false;
+            let currentFile = null;
+
+            // Extract repository ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const repoId = urlParams.get('repoId');
+
+            // Fetch repository name
+            async function fetchRepositoryName() {
+                if (!repoId) {
+                    repoNameElement.textContent = "No repository selected";
+                    return;
+                }
+
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/`, {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Token ${token}`,
+                        },
+                    });
+
+                    if (response.ok) {
+                        const repoData = await response.json();
+                        repoNameElement.textContent = repoData.name;
+                    } else {
+                        repoNameElement.textContent = "Failed to load repository";
+                    }
+                } catch (error) {
+                    console.error('Error fetching repository:', error);
+                    repoNameElement.textContent = "Error loading repository";
+                }
+            }
 
             // Initialize CodeMirror
             const editor = CodeMirror.fromTextArea(editorElement, {
@@ -407,7 +424,7 @@
                 editor.setOption('theme', isDark ? 'dracula' : 'default');
             });
 
-            //collapsible folders
+            // Collapsible folders
             document.querySelectorAll('.folder-item').forEach(folder => {
                 const folderHeader = folder.querySelector('div:first-child');
                 folderHeader.addEventListener('click', () => {
@@ -419,6 +436,105 @@
                     chevron.style.transform = folder.classList.contains('expanded') ? 'rotate(90deg)' : '';
                 });
             });
+
+            // Fetch repository name on page load
+            fetchRepositoryName();
+
+            // Create New File
+            createFileBtn.addEventListener('click', async () => {
+                const fileName = prompt('Enter the name of the new file (e.g., index.js):');
+                if (fileName) {
+                    try {
+                        const token = sessionStorage.getItem('authToken');
+                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({
+                                path: fileName,
+                                content: '',
+                            }),
+                        });
+
+                        if (response.ok) {
+                            const newFile = await response.json();
+                            addFileToTree(newFile.path);
+                        } else {
+                            console.error('Failed to create file:', response.statusText);
+                        }
+                    } catch (error) {
+                        console.error('Error creating file:', error);
+                    }
+                }
+            });
+
+            // Add File to Tree
+            function addFileToTree(fileName) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item p-2 hover:bg-gray-700 rounded';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file-code"></i>
+                    <span>${fileName}</span>
+                `;
+                fileItem.addEventListener('click', () => {
+                    currentFile = fileName;
+                    loadFileContent(fileName);
+                });
+                fileTree.querySelector('.file-tree').appendChild(fileItem);
+            }
+
+            // Load File Content
+            async function loadFileContent(fileName) {
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileName}`, {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Token ${token}`,
+                        },
+                    });
+
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        editor.setValue(fileData.content);
+                    } else {
+                        console.error('Failed to load file:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                }
+            }
+
+            // Save File
+            async function saveFile() {
+                if (currentFile) {
+                    const content = editor.getValue();
+                    try {
+                        const token = sessionStorage.getItem('authToken');
+                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${currentFile}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({ content }),
+                        });
+
+                        if (response.ok) {
+                            console.log('File saved successfully');
+                        } else {
+                            console.error('Failed to save file:', response.statusText);
+                        }
+                    } catch (error) {
+                        console.error('Error saving file:', error);
+                    }
+                } else {
+                    alert('No file is currently open.');
+                }
+            }
+
 
             // Collaboration Toggle
             shareCodeBtn.addEventListener('click', function () {
@@ -574,7 +690,7 @@
                 timer = setTimeout(() => func.apply(this, args), delay);
             };
         }
-        });
+        }); 
     </script>
 </body>
 
