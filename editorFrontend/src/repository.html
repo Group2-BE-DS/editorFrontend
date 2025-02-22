@@ -32,10 +32,15 @@
         margin-left: 0;
       }
     }
-    /* Scrollable repository cards */
+    /* Scrollable repository cards with hidden scrollbar */
     .repository-container {
       max-height: calc(100vh - 200px);
       overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    .repository-container::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Opera */
     }
     /* Centered popup modal */
     .popup-modal {
@@ -46,6 +51,10 @@
       z-index: 1000;
       width: 90%;
       max-width: 500px;
+    }
+    /* Smooth transitions for theme changes */
+    body, .bg-gray-800, .bg-gray-700, .bg-gray-900, .bg-gray-50, .text-gray-400, .text-gray-900, .dark\:text-white {
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
   </style>
 </head>
@@ -131,7 +140,7 @@
   <!-- Main Content -->
   <div class="graph-container">
     <!-- Navbar -->
-    <div class="bg-gray-800 p-4 rounded-md mb-6">
+    <div class="bg-gray-800 p-4 rounded-md mb-6 dark:bg-gray-700">
       <div class="flex justify-between items-center">
         <div class="text-xl font-semibold dark:text-white">My Repositories</div>
       </div>
@@ -141,9 +150,9 @@
     <div class="repository-container">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
         <!-- Example Repository Card (will be dynamically added) -->
-        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg hidden" id="repoCardTemplate">
+        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg dark:bg-gray-700 hidden" id="repoCardTemplate">
           <h3 class="text-xl font-semibold dark:text-white" id="repoName"></h3>
-          <p class="text-gray-400" id="repoDescription"></p>
+          <p class="text-gray-400 dark:text-gray-300" id="repoDescription"></p>
           <div class="mt-4 flex justify-between items-center">
             <a href="#" class="text-blue-500 hover:underline">View Details</a>
             <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
@@ -151,26 +160,26 @@
         </div>
 
         <!-- New Repository Card (Create New Repository) -->
-        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700" id="createRepoCard">
+        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg dark:bg-gray-700 cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-600" id="createRepoCard">
           <div class="flex justify-center items-center h-full">
-            <div class="text-2xl text-gray-400">+</div>
+            <div class="text-2xl text-gray-400 dark:text-gray-300">+</div>
           </div>
-          <p class="text-center text-gray-400 mt-4">Create New Repository</p>
+          <p class="text-center text-gray-400 dark:text-gray-300 mt-4">Create New Repository</p>
         </div>
       </div>
     </div>
 
     <!-- New Repository Form (Popup Modal) -->
-    <div id="createRepoForm" class="popup-modal bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+    <div id="createRepoForm" class="popup-modal bg-gray-800 p-6 rounded-lg shadow-lg dark:bg-gray-700 hidden">
       <h3 class="text-xl font-semibold dark:text-white mb-4">Create New Repository</h3>
       <form id="repositoryForm">
         <div class="mb-4">
-          <label for="repoNameInput" class="block text-gray-400">Repository Name</label>
-          <input type="text" id="repoNameInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository name" required />
+          <label for="repoNameInput" class="block text-gray-400 dark:text-gray-300">Repository Name</label>
+          <input type="text" id="repoNameInput" class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600" placeholder="Enter repository name" required />
         </div>
         <div class="mb-4">
-          <label for="repoDescriptionInput" class="block text-gray-400">Description</label>
-          <textarea id="repoDescriptionInput" class="w-full p-3 bg-gray-700 text-white rounded-lg" placeholder="Enter repository description"></textarea>
+          <label for="repoDescriptionInput" class="block text-gray-400 dark:text-gray-300">Description</label>
+          <textarea id="repoDescriptionInput" class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600" placeholder="Enter repository description"></textarea>
         </div>
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full">Create Repository</button>
       </form>
@@ -334,7 +343,11 @@
       newRepoCard.classList.remove("hidden");
       newRepoCard.querySelector("#repoName").textContent = repo.name;
       newRepoCard.querySelector("#repoDescription").textContent = repo.description;
-      newRepoCard.querySelector('a[href="#"]').href = `/repository/${repo.id}`; // Link to repository details
+
+      // Update the "View Details" link to include the repository ID
+      const viewDetailsLink = newRepoCard.querySelector('a[href="#"]');
+      viewDetailsLink.href = `canvas.html?repoId=${repo.id}`; // Pass repository ID as a query parameter
+
       document.getElementById("repositoryCards").insertBefore(newRepoCard, createRepoCard);
     }
 
