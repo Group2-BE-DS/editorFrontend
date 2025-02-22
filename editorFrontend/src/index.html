@@ -6,6 +6,7 @@
   <title>C.C.C Editor</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heatmap.js"></script> <!-- Heatmap.js library -->
   <script>
     // Check for saved theme preference or system preference
     if (
@@ -31,6 +32,29 @@
       .graph-container {
         margin-left: 0;
       }
+    }
+
+    /* Invisible Scrollbar */
+    body::-webkit-scrollbar {
+      width: 0.5em;
+    }
+    body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    body::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+    body {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+
+    /* Heatmap Container */
+    #heatmap-container {
+      width: 100%;
+      height: 300px;
+      margin-top: 2rem;
+      background-color: rgba(0, 0, 0, 0.1); /* Light background for heatmap */
     }
   </style>
 </head>
@@ -146,6 +170,9 @@
         <canvas id="timeDistributionChart" width="400" height="200"></canvas>
       </div>
     </div>
+
+    <!-- Heatmap Container -->
+    <div id="heatmap-container"></div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
@@ -189,9 +216,6 @@
           localStorage.setItem("color-theme", "dark");
         }
       }
-      
-      // Reload charts with new theme
-      populateCharts();
     });
 
     // Function to check if the user is authenticated
@@ -257,8 +281,8 @@
     }
 
     // WakaTime API Configuration
-    const apiKey = "waka_2478b416-3146-4db6-aa38-55ab35075aed";
-    const userId = "urvipadelkar";
+    const apiKey = "";
+    const userId = "";
     const baseURL = `https://wakatime.com/api/v1/users/${userId}`;
 
     // Function to fetch data from WakaTime
@@ -389,6 +413,37 @@
 
     // Initial chart population
     document.addEventListener("DOMContentLoaded", populateCharts);
+
+    // Heatmap Initialization
+    document.addEventListener("DOMContentLoaded", function () {
+      const heatmapContainer = document.getElementById("heatmap-container");
+      const heatmapInstance = h337.create({
+        container: heatmapContainer,
+      });
+
+      // Example heatmap data
+      const points = [];
+      const max = 100;
+      const width = heatmapContainer.offsetWidth;
+      const height = heatmapContainer.offsetHeight;
+      const len = 200;
+
+      while (len--) {
+        const val = Math.floor(Math.random() * max);
+        const point = {
+          x: Math.floor(Math.random() * width),
+          y: Math.floor(Math.random() * height),
+          value: val,
+        };
+        points.push(point);
+      }
+
+      // Set heatmap data
+      heatmapInstance.setData({
+        max: max,
+        data: points,
+      });
+    });
   </script>
 </body>
 </html>
