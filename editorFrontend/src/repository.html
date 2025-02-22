@@ -32,6 +32,21 @@
         margin-left: 0;
       }
     }
+    /* Scrollable repository cards */
+    .repository-container {
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    /* Centered popup modal */
+    .popup-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      width: 90%;
+      max-width: 500px;
+    }
   </style>
 </head>
 <body class="dark:bg-gray-900 h-screen overflow-hidden">
@@ -118,34 +133,36 @@
     <!-- Navbar -->
     <div class="bg-gray-800 p-4 rounded-md mb-6">
       <div class="flex justify-between items-center">
-        <div class="text-xl font-semibold">My Repositories</div>
+        <div class="text-xl font-semibold dark:text-white">My Repositories</div>
       </div>
     </div>
 
     <!-- Repository Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
-      <!-- Example Repository Card (will be dynamically added) -->
-      <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg hidden" id="repoCardTemplate">
-        <h3 class="text-xl font-semibold" id="repoName"></h3>
-        <p class="text-gray-400" id="repoDescription"></p>
-        <div class="mt-4 flex justify-between items-center">
-          <a href="#" class="text-blue-500 hover:underline">View Details</a>
-          <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
+    <div class="repository-container">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
+        <!-- Example Repository Card (will be dynamically added) -->
+        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg hidden" id="repoCardTemplate">
+          <h3 class="text-xl font-semibold dark:text-white" id="repoName"></h3>
+          <p class="text-gray-400" id="repoDescription"></p>
+          <div class="mt-4 flex justify-between items-center">
+            <a href="#" class="text-blue-500 hover:underline">View Details</a>
+            <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
+          </div>
         </div>
-      </div>
 
-      <!-- New Repository Card (Create New Repository) -->
-      <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700" id="createRepoCard">
-        <div class="flex justify-center items-center h-full">
-          <div class="text-2xl text-gray-400">+</div>
+        <!-- New Repository Card (Create New Repository) -->
+        <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700" id="createRepoCard">
+          <div class="flex justify-center items-center h-full">
+            <div class="text-2xl text-gray-400">+</div>
+          </div>
+          <p class="text-center text-gray-400 mt-4">Create New Repository</p>
         </div>
-        <p class="text-center text-gray-400 mt-4">Create New Repository</p>
       </div>
     </div>
 
-    <!-- New Repository Form (Hidden initially) -->
-    <div id="createRepoForm" class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6 hidden">
-      <h3 class="text-xl font-semibold mb-4">Create New Repository</h3>
+    <!-- New Repository Form (Popup Modal) -->
+    <div id="createRepoForm" class="popup-modal bg-gray-800 p-6 rounded-lg shadow-lg hidden">
+      <h3 class="text-xl font-semibold dark:text-white mb-4">Create New Repository</h3>
       <form id="repositoryForm">
         <div class="mb-4">
           <label for="repoNameInput" class="block text-gray-400">Repository Name</label>
