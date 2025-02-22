@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +13,7 @@
     }
   </style>
 </head>
-
 <body class="bg-gray-900 text-white dark:bg-gray-900 dark:text-white">
-
   <div class="flex justify-end p-4">
     <button id="theme-toggle" class="text-gray-400 dark:text-gray-200">
       <svg id="sun-icon" class="w-6 h-6 dark:hidden" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -65,11 +62,6 @@
   </div>
 
   <script>
-    // Redirect if already logged in
-    if (localStorage.getItem("authToken")) {
-      window.location.href = "index.html";
-    }
-
     // Theme toggle functionality
     const toggleButton = document.getElementById("theme-toggle");
     const sunIcon = document.getElementById("sun-icon");
@@ -90,27 +82,42 @@
       const password = document.getElementById("password").value;
       const errorMessage = document.getElementById("error-message");
 
-      const response = await fetch("http://127.0.0.1:8000/auth/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
+      const credentials = {
+        username: username, // Include the username field
+        email: email,       // Include the email field
+        password: password
+      };
 
-      if (response.ok) {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/auth/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(credentials)
+        });
+
+        if (!response.ok) {
+          throw new Error("Login failed");
+        }
+
         const data = await response.json();
-        localStorage.setItem("authToken", data.key); // Store the received token
-        alert("Login successful!");
-        window.location.href = "index.html"; // Redirect to index.html
-      } else {
-        const errorData = await response.json();
-        errorMessage.textContent = errorData.non_field_errors
-          ? errorData.non_field_errors[0]
-          : "Invalid login credentials.";
+        const token = data.key; // 'key' is the token returned by dj-rest-auth
+
+
+        // Store the token and user information in session storage
+        sessionStorage.setItem("authToken", token);
+
+        window.location.href = "index.html";
+
+
+        console.log("Login successful, data stored in session storage");
+
+        // Redirect to the index page after successful login
+      } catch (error) {
+        console.error("Error:", error);
+        errorMessage.textContent = "Login failed. Please check your credentials.";
         errorMessage.classList.remove("hidden");
       }
     });
   </script>
-
 </body>
-
 </html>
