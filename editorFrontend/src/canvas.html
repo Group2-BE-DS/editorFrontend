@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Your existing styles */
+        /* Your existing styles remain unchanged */
         .CodeMirror {
             height: 90vh;
             border: 1px solid #ddd;
@@ -63,7 +62,6 @@
             border-radius: 0.25rem;
         }
 
-        /* Toggle Switch Styles */
         .theme-toggle {
             display: flex;
             align-items: center;
@@ -127,7 +125,6 @@
             border-color: #4a5568;
         }
 
-        /* Light mode sidebar */
         html:not(.dark) #sidebar-multi-level-sidebar {
             background-color: #f8f9fa;
             color: #1a1a1a;
@@ -149,7 +146,6 @@
             border-color: #e2e8f0;
         }
 
-        /* Folder collapse styles */
         .folder-content {
             max-height: 0;
             overflow: hidden;
@@ -168,7 +164,6 @@
             transform: rotate(90deg);
         }
 
-        /* Connection status */
         .connection-status {
             position: fixed;
             top: 1rem;
@@ -191,7 +186,6 @@
             color: white;
         }
 
-        /* App title styles */
         .app-title {
             font-size: 1.5rem;
             font-weight: bold;
@@ -201,7 +195,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Repository name styles */
         .repo-name {
             font-size: 1.25rem;
             font-weight: bold;
@@ -209,11 +202,58 @@
             border-bottom: 1px solid #4a5568;
             margin-bottom: 1rem;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #2d3748;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid #4a5568;
+            background-color: #1a202c;
+            color: white;
+        }
+
+        .modal-content button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modal-content button.confirm {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .modal-content button.cancel {
+            background-color: #718096;
+            color: white;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
-
 <body class="dark">
-
     <div id="connectionStatus" class="connection-status">
         Connecting...
     </div>
@@ -222,11 +262,9 @@
         class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-800 flex flex-col">
-            <!-- App Title -->
             <div class="app-title text-white border-gray-700">
                 C.C.C
             </div>
-            <!-- File Operations -->
             <div class="flex gap-2 mb-4 p-2 border-b border-gray-700">
                 <div class="tooltip">
                     <button id="createFileBtn" class="text-white hover:bg-gray-700 p-2 rounded">
@@ -240,6 +278,12 @@
                     </button>
                     <span class="tooltiptext">Create New Folder</span>
                 </div>
+                <div class="tooltip">
+                    <button id="saveFileBtn" class="text-white hover:bg-gray-700 p-2 rounded">
+                        <i class="fas fa-save"></i>
+                    </button>
+                    <span class="tooltiptext">Save File</span>
+                </div>
                 <div class="tooltip ml-auto">
                     <button id="settingsButton" class="text-white hover:bg-gray-700 p-2 rounded">
                         <i class="fas fa-cog"></i>
@@ -248,19 +292,16 @@
                 </div>
             </div>
 
-            <!-- Repository Name -->
             <div id="repoName" class="repo-name text-white">
                 Loading repository...
             </div>
 
-            <!-- File Tree -->
             <div class="flex-1 overflow-y-auto text-white" id="fileTree">
                 <div class="file-tree">
                     <!-- Dynamic file tree will be populated here -->
                 </div>
             </div>
 
-            <!-- Bottom Actions -->
             <div class="mt-auto border-t border-gray-700 pt-4">
                 <div class="tooltip w-full">
                     <button id="shareCodeBtn"
@@ -279,7 +320,7 @@
                     <span class="tooltiptext">AI-powered code generation</span>
                 </div>
                 <div class="tooltip w-full">
-                    <button
+                    <button onclick="window.open('https://readme-ai.streamlit.app/', '_blank')"
                         class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
                         <i class="fas fa-file-alt"></i>
                         <span>Generate Docs</span>
@@ -298,7 +339,17 @@
         </div>
     </aside>
 
-    <!-- Settings Modal -->
+    <div id="fileCreationModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold mb-4">Create New File</h3>
+            <input type="text" id="fileNameInput" placeholder="Enter file name (e.g., index.js)">
+            <div class="flex justify-end">
+                <button id="confirmCreateFile" class="confirm">Create</button>
+                <button id="cancelCreateFile" class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="settingsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-800">
             <div class="mt-3 text-center">
@@ -365,32 +416,30 @@
             const connectionStatus = document.getElementById('connectionStatus');
             const createFileBtn = document.getElementById('createFileBtn');
             const createFolderBtn = document.getElementById('createFolderBtn');
+            const saveFileBtn = document.getElementById('saveFileBtn'); // Added save button
             const fileTree = document.getElementById('fileTree');
             const repoNameElement = document.getElementById('repoName');
+            const fileCreationModal = document.getElementById('fileCreationModal');
+            const fileNameInput = document.getElementById('fileNameInput');
+            const confirmCreateFile = document.getElementById('confirmCreateFile');
+            const cancelCreateFile = document.getElementById('cancelCreateFile');
             let socket = null;
             let isCollaborating = false;
-            let currentFile = null;
+            let currentFile = null; // Now stores { id, path }
 
-            // Extract repository ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const repoId = urlParams.get('repoId');
 
-            // Fetch repository name
             async function fetchRepositoryName() {
                 if (!repoId) {
                     repoNameElement.textContent = "No repository selected";
                     return;
                 }
-
                 try {
                     const token = sessionStorage.getItem('authToken');
                     const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/`, {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Token ${token}`,
-                        },
+                        headers: { Authorization: `Token ${token}` },
                     });
-
                     if (response.ok) {
                         const repoData = await response.json();
                         repoNameElement.textContent = repoData.name;
@@ -403,7 +452,6 @@
                 }
             }
 
-            // Initialize CodeMirror
             const editor = CodeMirror.fromTextArea(editorElement, {
                 lineNumbers: true,
                 mode: languageSelect.value,
@@ -415,7 +463,6 @@
                 lint: true,
             });
 
-            // Dark Mode Toggle
             darkModeToggle.addEventListener('change', function () {
                 const isDark = this.checked;
                 document.documentElement.classList.toggle('dark', isDark);
@@ -424,96 +471,73 @@
                 editor.setOption('theme', isDark ? 'dracula' : 'default');
             });
 
-            // Collapsible folders
             document.querySelectorAll('.folder-item').forEach(folder => {
                 const folderHeader = folder.querySelector('div:first-child');
                 folderHeader.addEventListener('click', () => {
                     const content = folder.querySelector('.folder-content');
                     const chevron = folder.querySelector('.fa-chevron-right');
-
                     folder.classList.toggle('expanded');
                     content.classList.toggle('expanded');
                     chevron.style.transform = folder.classList.contains('expanded') ? 'rotate(90deg)' : '';
                 });
             });
 
-            // Fetch repository name on page load
-            fetchRepositoryName();
-
-            // Create New File
-            createFileBtn.addEventListener('click', async () => {
-                const fileName = prompt('Enter the name of the new file (e.g., index.js):');
-                if (fileName) {
-                    try {
-                        const token = sessionStorage.getItem('authToken');
-                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Token ${token}`,
-                            },
-                            body: JSON.stringify({
-                                path: fileName,
-                                content: '',
-                            }),
-                        });
-
-                        if (response.ok) {
-                            const newFile = await response.json();
-                            addFileToTree(newFile.path);
-                        } else {
-                            console.error('Failed to create file:', response.statusText);
-                        }
-                    } catch (error) {
-                        console.error('Error creating file:', error);
+            // Load initial file tree
+            async function loadFileTree() {
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+                        headers: { Authorization: `Token ${token}` },
+                    });
+                    if (response.ok) {
+                        const files = await response.json();
+                        fileTree.querySelector('.file-tree').innerHTML = '';
+                        files.forEach(file => addFileToTree(file));
+                    } else {
+                        console.error('Failed to load file tree:', await response.json());
                     }
+                } catch (error) {
+                    console.error('Error loading file tree:', error);
                 }
-            });
+            }
 
-            // Add File to Tree
-            function addFileToTree(fileName) {
+            function addFileToTree(file) {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item p-2 hover:bg-gray-700 rounded';
                 fileItem.innerHTML = `
                     <i class="fas fa-file-code"></i>
-                    <span>${fileName}</span>
+                    <span>${file.path}</span>
                 `;
                 fileItem.addEventListener('click', () => {
-                    currentFile = fileName;
-                    loadFileContent(fileName);
+                    currentFile = { id: file.id, path: file.path };
+                    loadFileContent(file.id);
                 });
                 fileTree.querySelector('.file-tree').appendChild(fileItem);
             }
 
-            // Load File Content
-            async function loadFileContent(fileName) {
+            async function loadFileContent(fileId) {
                 try {
                     const token = sessionStorage.getItem('authToken');
-                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileName}`, {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Token ${token}`,
-                        },
+                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileId}/`, {
+                        headers: { Authorization: `Token ${token}` },
                     });
-
                     if (response.ok) {
                         const fileData = await response.json();
                         editor.setValue(fileData.content);
                     } else {
-                        console.error('Failed to load file:', response.statusText);
+                        console.error('Failed to load file:', await response.json());
                     }
                 } catch (error) {
                     console.error('Error loading file:', error);
                 }
             }
 
-            // Save File
             async function saveFile() {
                 if (currentFile) {
                     const content = editor.getValue();
                     try {
                         const token = sessionStorage.getItem('authToken');
-                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${currentFile}`, {
+                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${currentFile.id}/`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -521,11 +545,10 @@
                             },
                             body: JSON.stringify({ content }),
                         });
-
                         if (response.ok) {
                             console.log('File saved successfully');
                         } else {
-                            console.error('Failed to save file:', response.statusText);
+                            console.error('Failed to save file:', await response.json());
                         }
                     } catch (error) {
                         console.error('Error saving file:', error);
@@ -535,163 +558,131 @@
                 }
             }
 
+            createFileBtn.addEventListener('click', () => {
+                fileCreationModal.style.display = 'flex';
+            });
 
-            // Collaboration Toggle
+            cancelCreateFile.addEventListener('click', () => {
+                fileCreationModal.style.display = 'none';
+                fileNameInput.value = '';
+            });
+
+            confirmCreateFile.addEventListener('click', async () => {
+                const fileName = fileNameInput.value.trim();
+                if (fileName && /^[a-zA-Z0-9._-]+$/.test(fileName)) { // Sanitize input
+                    try {
+                        const token = sessionStorage.getItem('authToken');
+                        const payload = { path: fileName, content: '' };
+                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify(payload),
+                        });
+                        if (response.ok) {
+                            const newFile = await response.json();
+                            addFileToTree(newFile);
+                            fileCreationModal.style.display = 'none';
+                            fileNameInput.value = '';
+                        } else {
+                            const errorData = await response.json();
+                            console.error('Failed to create file:', errorData);
+                            alert(`Failed to create file: ${JSON.stringify(errorData)}`);
+                        }
+                    } catch (error) {
+                        console.error('Error creating file:', error);
+                        alert('Error creating file. Check console for details.');
+                    }
+                } else {
+                    alert('Invalid file name. Use only letters, numbers, dots, underscores, or hyphens.');
+                }
+            });
+
+            saveFileBtn.addEventListener('click', saveFile); // Trigger save
+
             shareCodeBtn.addEventListener('click', function () {
                 if (!isCollaborating) {
-                    try {
-                        connectionStatus.textContent = 'Connecting...';
-                        connectionStatus.className = 'connection-status';
-                        connectionStatus.style.display = 'block';
+                    connectionStatus.textContent = 'Connecting...';
+                    connectionStatus.className = 'connection-status';
+                    connectionStatus.style.display = 'block';
 
-                        socket = new WebSocket('ws://localhost:8000/ws/editor/');
+                    socket = new WebSocket('ws://localhost:8000/ws/editor/');
 
-                        socket.onopen = function () {
-                            isCollaborating = true;
-                            shareCodeBtn.classList.add('collaboration-active');
-                            shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
-                            connectionStatus.textContent = 'Connected!';
-                            connectionStatus.classList.add('connected');
+                    socket.onopen = function () {
+                        isCollaborating = true;
+                        shareCodeBtn.classList.add('collaboration-active');
+                        shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+                        connectionStatus.textContent = 'Connected!';
+                        connectionStatus.classList.add('connected');
+                        const initialCode = editor.getValue();
+                        if (initialCode) {
+                            socket.send(JSON.stringify({ type: 'codeUpdate', content: initialCode, fileId: currentFile?.id }));
+                        }
+                    };
 
-                            // Send initial code
-                            const initialCode = editor.getValue();
-                            if (initialCode) {
-                                socket.send(JSON.stringify({ type: 'codeUpdate', content: initialCode }));
-                            }
-                        };
+                    socket.onmessage = function (event) {
+                        const message = JSON.parse(event.data);
+                        if (message.type === 'update' && message.fileId === currentFile?.id && editor.getValue() !== message.content) {
+                            editor.setValue(message.content);
+                        }
+                    };
 
-                        socket.onmessage = function (event) {
-                            const message = JSON.parse(event.data);
-                            if (message.type === 'update' && editor.getValue() !== message.content) {
-                                editor.setValue(message.content);
-                            }
-                        };
-
-                        socket.onerror = function (error) {
-                            console.error('WebSocket Error:', error);
-                            connectionStatus.textContent = 'Connection Failed!';
-                            connectionStatus.classList.add('error');
-                            setTimeout(() => {
-                                connectionStatus.style.display = 'none';
-                            }, 3000);
-                        };
-
-                        socket.onclose = function () {
-                            isCollaborating = false;
-                            shareCodeBtn.classList.remove('collaboration-active');
-                            shareCodeBtn.querySelector('span').textContent = 'Share Code';
-                            connectionStatus.textContent = 'Disconnected';
-                            setTimeout(() => {
-                                connectionStatus.style.display = 'none';
-                            }, 3000);
-                        };
-
-                    } catch (error) {
-                        console.error('Failed to establish WebSocket connection:', error);
+                    socket.onerror = function (error) {
+                        console.error('WebSocket Error:', error);
                         connectionStatus.textContent = 'Connection Failed!';
                         connectionStatus.classList.add('error');
-                        setTimeout(() => {
-                            connectionStatus.style.display = 'none';
-                        }, 3000);
-                    }
+                        setTimeout(() => connectionStatus.style.display = 'none', 3000);
+                    };
 
-                    // Add change listener for collaborative editing
+                    socket.onclose = function () {
+                        isCollaborating = false;
+                        shareCodeBtn.classList.remove('collaboration-active');
+                        shareCodeBtn.querySelector('span').textContent = 'Share Code';
+                        connectionStatus.textContent = 'Disconnected';
+                        setTimeout(() => connectionStatus.style.display = 'none', 3000);
+                    };
+
                     editor.on('change', debounce(function () {
                         if (socket && socket.readyState === WebSocket.OPEN) {
                             const code = editor.getValue();
-                            socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
+                            socket.send(JSON.stringify({ type: 'codeUpdate', content: code, fileId: currentFile?.id }));
                         }
                     }, 500));
-
                 } else {
-                    if (socket) {
-                        socket.close();
-                    }
-                    isCollaborating = false;
-                    shareCodeBtn.classList.remove('collaboration-active');
-                    shareCodeBtn.querySelector('span').textContent = 'Share Code';
+                    if (socket) socket.close();
                 }
-            }); if (!isCollaborating) {
-                // Initialize WebSocket
-                socket = new WebSocket('ws://localhost:8000/ws/editor/');
+            });
 
-                socket.onopen = function () {
-                    isCollaborating = true;
-                    shareCodeBtn.classList.add('collaboration-active');
-                    shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+            settingsButton.addEventListener('click', () => {
+                settingsModal.classList.remove('hidden');
+            });
 
-                    // Send initial code
-                    const initialCode = editor.getValue();
-                    if (initialCode) {
-                        socket.send(JSON.stringify({ type: 'codeUpdate', content: initialCode }));
-                    }
+            closeSettings.addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+
+            languageSelect.addEventListener('change', function () {
+                editor.setOption('mode', languageSelect.value);
+                editor.refresh();
+            });
+
+            themeSelect.addEventListener('change', function () {
+                editor.setOption('theme', themeSelect.value);
+            });
+
+            function debounce(func, delay) {
+                let timer;
+                return function (...args) {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, args), delay);
                 };
-
-                socket.onmessage = function (event) {
-                    const message = JSON.parse(event.data);
-                    if (message.type === 'update' && editor.getValue() !== message.content) {
-                        editor.setValue(message.content);
-                    }
-                };
-
-                socket.onerror = function (error) {
-                    console.error('WebSocket Error:', error);
-                };
-
-                socket.onclose = function () {
-                    isCollaborating = false;
-                    shareCodeBtn.classList.remove('collaboration-active');
-                    shareCodeBtn.querySelector('span').textContent = 'Share Code';
-                };
-
-                // Add change listener for collaborative editing
-                editor.on('change', debounce(function () {
-                    if (socket && socket.readyState === WebSocket.OPEN) {
-                        const code = editor.getValue();
-                        socket.send(JSON.stringify({ type: 'codeUpdate', content: code }));
-                    }
-                }, 500));
-
-            } else {
-                // Close WebSocket connection
-                if (socket) {
-                    socket.close();
-                }
-                isCollaborating = false;
-                shareCodeBtn.classList.remove('collaboration-active');
-                shareCodeBtn.querySelector('span').textContent = 'Share Code';
             }
- 
 
-        // Settings Modal
-        settingsButton.addEventListener('click', () => {
-            settingsModal.classList.remove('hidden');
+            // Initialize
+            fetchRepositoryName().then(loadFileTree);
         });
-
-        closeSettings.addEventListener('click', () => {
-            settingsModal.classList.add('hidden');
-        });
-
-        // Language and Theme changes
-        languageSelect.addEventListener('change', function () {
-            editor.setOption('mode', languageSelect.value);
-            editor.refresh();
-        });
-
-        themeSelect.addEventListener('change', function () {
-            editor.setOption('theme', themeSelect.value);
-        });
-
-        // Debounce helper function
-        function debounce(func, delay) {
-            let timer;
-            return function (...args) {
-                clearTimeout(timer);
-                timer = setTimeout(() => func.apply(this, args), delay);
-            };
-        }
-        }); 
     </script>
 </body>
-
 </html>

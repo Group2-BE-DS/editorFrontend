@@ -6,7 +6,7 @@ function startDjangoServer() {
   // Define the command to activate the virtual environment and run the Django server
   const djangoBackend = spawn('cmd.exe', [
     '/c', // Use /c to run the command and then terminate
-    'E:\\MJ\\editorBackend\\editorBackend\\env\\Scripts\\activate && python E:\\MJ\\editorBackend\\manage.py runserver --noreload'
+    'C:\\Users\\prade\\Onedrive\\Documents\\GitHub\\editorBackend\\env\\Scripts\\activate && python C:\\Users\\prade\\Onedrive\\Documents\\GitHub\\editorBackend\\manage.py runserver --noreload'
   ], {
     shell: true, // Use shell to allow command chaining
   });
