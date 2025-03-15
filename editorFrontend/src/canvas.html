@@ -273,6 +273,12 @@
             z-index: 50;
             display: none;
         }
+
+        /* Add this to your existing styles section */
+        .file-item.active {
+            background-color: rgba(66, 153, 225, 0.3);
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body class="dark">
@@ -296,12 +302,6 @@
                         <i class="fas fa-file-plus"></i>
                     </button>
                     <span class="tooltiptext">Create New File</span>
-                </div>
-                <div class="tooltip">
-                    <button id="createFolderBtn" class="text-white hover:bg-gray-700 p-2 rounded">
-                        <i class="fas fa-folder-plus"></i>
-                    </button>
-                    <span class="tooltiptext">Create New Folder</span>
                 </div>
                 <div class="tooltip">
                     <button id="saveFileBtn" class="text-white hover:bg-gray-700 p-2 rounded">
@@ -366,8 +366,9 @@
 
     <div id="fileCreationModal" class="modal">
         <div class="modal-content">
-            <h3 class="text-lg font-bold mb-4">Create New File</h3>
-            <input type="text" id="fileNameInput" placeholder="Enter file name (e.g., index.js)">
+            <h3 class="text-lg font-bold mb-4 text-white">Create New File</h3>
+            <p class="text-sm text-gray-400 mb-2">You can include a path to create folders (e.g., folder/file.txt)</p>
+            <input type="text" id="fileNameInput" placeholder="Enter file name or path/file.txt">
             <div class="flex justify-end">
                 <button id="confirmCreateFile" class="confirm">Create</button>
                 <button id="cancelCreateFile" class="cancel">Cancel</button>
@@ -488,7 +489,6 @@
             const connectionStatus = document.getElementById('connectionStatus');
             const saveStatus = document.getElementById('saveStatus');
             const createFileBtn = document.getElementById('createFileBtn');
-            const createFolderBtn = document.getElementById('createFolderBtn');
             const saveFileBtn = document.getElementById('saveFileBtn');
             const fileTree = document.getElementById('fileTree');
             const repoNameElement = document.getElementById('repoName');
@@ -564,12 +564,46 @@
                 }
             }
     
+            // Replace the addFileToTree function
             function addFileToTree(file) {
+                const parts = file.path.split('/');
+                let currentContainer = fileTree.querySelector('.file-tree');
+                
+                // Create folders if needed
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const folderName = parts[i];
+                    let folder = currentContainer.querySelector(`[data-folder="${folderName}"]`);
+                    
+                    if (!folder) {
+                        folder = document.createElement('div');
+                        folder.className = 'folder-container';
+                        folder.innerHTML = `
+                            <div class="folder-item p-2 hover:bg-gray-700 rounded flex items-center">
+                                <i class="fas fa-chevron-right mr-2"></i>
+                                <i class="fas fa-folder mr-2"></i>
+                                <span>${folderName}</span>
+                            </div>
+                            <div class="folder-content ml-4" data-folder="${folderName}">
+                            </div>
+                        `;
+                        
+                        // Add folder click handler
+                        folder.querySelector('.folder-item').addEventListener('click', () => {
+                            folder.querySelector('.folder-content').classList.toggle('expanded');
+                            folder.querySelector('.folder-item').classList.toggle('expanded');
+                        });
+                        
+                        currentContainer.appendChild(folder);
+                    }
+                    currentContainer = currentContainer.querySelector(`[data-folder="${folderName}"]`);
+                }
+            
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item p-2 hover:bg-gray-700 rounded flex items-center';
+                fileItem.dataset.fileId = file.id;
                 fileItem.innerHTML = `
                     <i class="fas fa-file-code mr-2"></i>
-                    <span>${file.path}</span>
+                    <span>${parts[parts.length - 1]}</span>
                     <div class="file-actions">
                         <button class="delete-file-btn text-red-500 hover:text-red-400">
                             <i class="fas fa-trash"></i>
@@ -579,10 +613,17 @@
                 
                 // Add click event for the file
                 fileItem.querySelector('span').addEventListener('click', () => {
+                    // Remove active class from all files
+                    document.querySelectorAll('.file-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked file
+                    fileItem.classList.add('active');
+                    
                     currentFile = { id: file.id, path: file.path };
                     currentFileName.textContent = file.path;
                     showEditor();
-                    console.log('Requesting file content for:', file.id);  // Debug log
                     loadFileContent(file.id);
                 });
                 
@@ -592,7 +633,7 @@
                     deleteFile(file.id, file.path);
                 });
                 
-                fileTree.querySelector('.file-tree').appendChild(fileItem);
+                currentContainer.appendChild(fileItem);
             }
     
             function showEditor() {
@@ -729,11 +770,12 @@
             });
     
             confirmCreateFile.addEventListener('click', async () => {
-                const fileName = fileNameInput.value.trim();
-                if (fileName && /^[a-zA-Z0-9._-]+$/.test(fileName)) { // Sanitize input
+                const filePath = fileNameInput.value.trim();
+                // Allow paths with forward slashes, letters, numbers, dots, underscores, or hyphens
+                if (filePath && /^[a-zA-Z0-9._/-]+$/.test(filePath)) {
                     try {
                         const token = sessionStorage.getItem('authToken');
-                        const payload = { path: fileName, content: '' };
+                        const payload = { path: filePath, content: '' };
                         const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
                             method: 'POST',
                             headers: {
@@ -744,7 +786,7 @@
                         });
                         if (response.ok) {
                             const newFile = await response.json();
-                            addFileToTree(newFile);
+                            loadFileTree(); // Reload entire file tree to show new structure
                             fileCreationModal.style.display = 'none';
                             fileNameInput.value = '';
                             
@@ -764,7 +806,7 @@
                         alert('Error creating file. Check console for details.');
                     }
                 } else {
-                    alert('Invalid file name. Use only letters, numbers, dots, underscores, or hyphens.');
+                    alert('Invalid file path. Use only letters, numbers, dots, underscores, hyphens, and forward slashes.');
                 }
             });
     
