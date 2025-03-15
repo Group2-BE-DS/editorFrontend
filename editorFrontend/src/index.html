@@ -6,12 +6,12 @@
   <title>C.C.C Editor</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/heatmap.js"></script> <!-- Heatmap.js library -->
   <script>
-    // Check for saved theme preference or system preference
+    // Check for saved or system theme preference
     if (
       localStorage.getItem("color-theme") === "dark" ||
-      (!("color-theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      (!("color-theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       document.documentElement.classList.add("dark");
     } else {
@@ -19,6 +19,23 @@
     }
   </script>
   <style>
+    html, body {
+      margin: 0; 
+      padding: 0;
+    }
+    /* Hide scrollbar across browsers */
+    body {
+      overflow-y: auto;
+      scrollbar-width: none;         /* Firefox */
+      -ms-overflow-style: none;      /* IE/Edge */
+    }
+    body::-webkit-scrollbar {        /* Chrome, Safari */
+      width: 0 !important;
+      height: 0 !important;
+      display: none;
+      background: transparent;
+    }
+
     canvas {
       max-width: 100% !important;
       height: 300px !important;
@@ -34,31 +51,31 @@
       }
     }
 
-    /* Invisible Scrollbar */
-    body::-webkit-scrollbar {
-      width: 0.5em;
-    }
-    body::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    body::-webkit-scrollbar-thumb {
-      background: transparent;
-    }
-    body {
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
-    }
-
-    /* Heatmap Container */
+    /* Calendar-like heatmap container */
     #heatmap-container {
       width: 100%;
-      height: 300px;
       margin-top: 2rem;
-      background-color: rgba(0, 0, 0, 0.1); /* Light background for heatmap */
+      display: grid;
+      grid-template-columns: repeat(53, 13px);
+      grid-gap: 4px;
+      justify-content: start;
+      padding: 1rem;
     }
+    /* Each square for daily data */
+    .day-square {
+      width: 13px;
+      height: 13px;
+      background-color: #ebedf0; /* default color for 0 data */
+      border-radius: 2px;
+      transition: background-color 0.3s;
+    }
+    .level-1 { background-color: #c6e48b; }
+    .level-2 { background-color: #7bc96f; }
+    .level-3 { background-color: #239a3b; }
+    .level-4 { background-color: #196127; }
   </style>
 </head>
-<body class="dark:bg-gray-900 h-screen overflow-hidden">
+<body class="dark:bg-gray-900 min-h-screen">
   <!-- Navbar -->
   <nav class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -105,31 +122,31 @@
   </nav>
 
   <!-- Sidebar -->
-  <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-    <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+  <aside id="sidebar-multi-level-sidebar" class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-gray-50 dark:bg-gray-800" aria-label="Sidebar">
+    <div class="h-full px-3 py-4 overflow-y-auto">
       <ul class="space-y-2 font-medium">
         <li>
-          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a href="#" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="ms-3">Dashboard</span>
           </a>
         </li>
         <li>
-          <a href="repository.html" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a href="repository.html" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="ms-3">Public Repository</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a href="#" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="ms-3">Private Repository</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a href="#" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="ms-3">Forked Repository</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a href="#" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="ms-3">Other's Repository</span>
           </a>
         </li>
@@ -171,34 +188,63 @@
       </div>
     </div>
 
-    <!-- Heatmap Container -->
-    <div id="heatmap-container"></div>
+    <!-- Calendar-Style Heatmap Container -->
+    <!-- Heatmap card -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col mt-6">
+      <h2 class="text-xl font-bold mb-4 text-center dark:text-white">Contributions Heatmap</h2>
+      <div id="heatmap-container"></div>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
   <script>
-    // Theme toggle functionality
-    var themeToggleDarkIcon = document.getElementById("theme-toggle-dark-icon");
-    var themeToggleLightIcon = document.getElementById("theme-toggle-light-icon");
+    let allCharts = [];
 
-    // Change the icons inside the button based on previous settings
+    // Re-apply theme to all charts
+    function refreshChartsTheme() {
+      const isDarkMode = document.documentElement.classList.contains("dark");
+
+      for (const chart of allCharts) {
+        const textColor = isDarkMode ? "#fff" : "#666";
+        chart.options.plugins.legend.labels.color = textColor;
+        chart.options.plugins.tooltip.backgroundColor = isDarkMode
+          ? "rgba(0, 0, 0, 0.7)"
+          : "rgba(255, 255, 255, 0.7)";
+        chart.options.plugins.tooltip.titleColor = isDarkMode ? "#fff" : "#000";
+        chart.options.plugins.tooltip.bodyColor = isDarkMode ? "#fff" : "#000";
+        chart.options.scales.x.grid.color = isDarkMode
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.1)";
+        chart.options.scales.y.grid.color = isDarkMode
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.1)";
+        chart.options.scales.x.ticks.color = textColor;
+        chart.options.scales.y.ticks.color = textColor;
+        chart.update();
+      }
+    }
+
+    // Theme toggle
+    const themeToggleDarkIcon = document.getElementById("theme-toggle-dark-icon");
+    const themeToggleLightIcon = document.getElementById("theme-toggle-light-icon");
+    const themeToggleBtn = document.getElementById("theme-toggle");
+
     if (
       localStorage.getItem("color-theme") === "dark" ||
-      (!("color-theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+      (!("color-theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       themeToggleLightIcon.classList.remove("hidden");
     } else {
       themeToggleDarkIcon.classList.remove("hidden");
     }
 
-    var themeToggleBtn = document.getElementById("theme-toggle");
-
     themeToggleBtn.addEventListener("click", function () {
       // Toggle icons
       themeToggleDarkIcon.classList.toggle("hidden");
       themeToggleLightIcon.classList.toggle("hidden");
 
-      // If is set in localStorage
+      // Toggle theme
       if (localStorage.getItem("color-theme")) {
         if (localStorage.getItem("color-theme") === "light") {
           document.documentElement.classList.add("dark");
@@ -216,34 +262,26 @@
           localStorage.setItem("color-theme", "dark");
         }
       }
+      refreshChartsTheme();
     });
 
-    // Function to check if the user is authenticated
+    // Check auth
     async function checkAuth() {
       try {
         const token = sessionStorage.getItem("authToken");
         if (!token) {
-          // No token, redirect to login
           window.location.href = "login.html";
           return;
         }
-
         const response = await fetch("http://127.0.0.1:8000/auth/user/", {
           method: "GET",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-          credentials: "include", // Include cookies for session-based auth
+          headers: { Authorization: `Token ${token}` },
+          credentials: "include",
         });
-
-        console.log("User response status:", response.status); // Debug: Log the response status
-
         if (!response.ok) {
-          // Token is invalid, clear it and redirect to login
           sessionStorage.removeItem("authToken");
           window.location.href = "login.html";
         } else {
-          // Token is valid, proceed to load the page
           const user = await response.json();
           document.getElementById("user-name").textContent = user.username || "User Name";
           document.getElementById("user-email").textContent = user.email || "user@example.com";
@@ -257,19 +295,16 @@
         window.location.href = "login.html";
       }
     }
-
-    // Check authentication on page load
     document.addEventListener("DOMContentLoaded", checkAuth);
 
-    // Logout function
+    // Logout
     function logout() {
       fetch("http://127.0.0.1:8000/auth/logout/", {
         method: "POST",
-        credentials: "include", // Include cookies for session-based auth
+        credentials: "include",
       })
         .then((response) => {
           if (response.ok) {
-            // Clear session storage and redirect to login page
             sessionStorage.removeItem("authToken");
             sessionStorage.removeItem("userInfo");
             window.location.href = "login.html";
@@ -280,12 +315,12 @@
         .catch((error) => console.error("Error during logout:", error));
     }
 
-    // WakaTime API Configuration
+    // WakaTime API config
     const apiKey = "waka_3563f495-72bd-4fff-989f-5e2aca89fa50";
     const userId = "MeJaM35";
     const baseURL = `https://wakatime.com/api/v1/users/${userId}`;
 
-    // Function to fetch data from WakaTime
+    // Fetch from WakaTime
     async function fetchWakaTimeData(endpoint) {
       const url = `${baseURL}${endpoint}`;
       const response = await fetch(url, {
@@ -293,17 +328,16 @@
           Authorization: `Basic ${btoa(apiKey)}`,
         },
       });
-      const data = await response.json();
-      return data;
+      return await response.json();
     }
 
-    // Function to create charts with theme awareness
+    // Create chart
     function createChart(canvasId, type, labels, data, label, colors) {
       const isDarkMode = document.documentElement.classList.contains("dark");
       const chartTextColor = isDarkMode ? "#fff" : "#666";
-      
       const ctx = document.getElementById(canvasId).getContext("2d");
-      return new Chart(ctx, {
+
+      const newChart = new Chart(ctx, {
         type: type,
         data: {
           labels: labels,
@@ -330,7 +364,9 @@
             },
             tooltip: {
               enabled: true,
-              backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.7)" : "rgba(255, 255, 255, 0.7)",
+              backgroundColor: isDarkMode
+                ? "rgba(0, 0, 0, 0.7)"
+                : "rgba(255, 255, 255, 0.7)",
               titleColor: isDarkMode ? "#fff" : "#000",
               bodyColor: isDarkMode ? "#fff" : "#000",
             },
@@ -339,7 +375,9 @@
             x: {
               grid: {
                 display: true,
-                color: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                color: isDarkMode
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)",
               },
               ticks: {
                 color: chartTextColor,
@@ -348,7 +386,9 @@
             y: {
               grid: {
                 display: true,
-                color: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+                color: isDarkMode
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)",
               },
               ticks: {
                 color: chartTextColor,
@@ -357,92 +397,84 @@
           },
         },
       });
+
+      allCharts.push(newChart);
+      return newChart;
     }
 
-    // Fetch and populate charts
+    // Build charts
     async function populateCharts() {
-      // Fetch daily activity data
+      // Daily activity
       const activityData = await fetchWakaTimeData("/summaries?range=last_7_days");
-      const activityLabels = activityData.data.map((summary) =>
-        new Date(summary.range.date).toLocaleDateString("en-US", { weekday: "short" })
+      const activityLabels = activityData.data.map((day) =>
+        new Date(day.range.date).toLocaleDateString("en-US", { weekday: "short" })
       );
       const activityValues = activityData.data.map(
-        (summary) => parseFloat(summary.grand_total.hours) + parseFloat(summary.grand_total.minutes) / 60
+        (day) => parseFloat(day.grand_total.hours) + parseFloat(day.grand_total.minutes) / 60
       );
       createChart("activityChart", "line", activityLabels, activityValues, "Daily Activity", {
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
       });
 
-      // Fetch language usage data
+      // Languages Used
       const languageData = await fetchWakaTimeData("/stats/last_7_days");
-      const languageLabels = languageData.data.languages.map((lang) => lang.name);
-      const languageValues = languageData.data.languages.map((lang) => lang.total_seconds / 3600);
-      createChart("languageChart", "doughnut", languageLabels, languageValues, "Languages Used", {
+      const langLabels = languageData.data.languages.map((l) => l.name);
+      const langValues = languageData.data.languages.map((l) => l.total_seconds / 3600);
+      createChart("languageChart", "doughnut", langLabels, langValues, "Languages Used", {
         backgroundColor: ["#ff6384", "#36a2eb", "#cc65fe", "#ffce56"],
         borderColor: ["#ff6384", "#36a2eb", "#cc65fe", "#ffce56"],
       });
 
-      // Fetch editors usage data
-      const editorsData = await fetchWakaTimeData("/stats/last_7_days");
-      const editorsLabels = editorsData.data.editors.map((editor) => editor.name);
-      const editorsValues = editorsData.data.editors.map((editor) => editor.total_seconds / 3600);
+      // Editors
+      const editorsLabels = languageData.data.editors.map((e) => e.name);
+      const editorsValues = languageData.data.editors.map((e) => e.total_seconds / 3600);
       createChart("editorsChart", "bar", editorsLabels, editorsValues, "Editors Used", {
         backgroundColor: ["#ff6384", "#36a2eb"],
         borderColor: ["#ff6384", "#36a2eb"],
       });
 
-      // Fetch projects breakdown data
-      const projectsData = await fetchWakaTimeData("/stats/last_7_days");
-      const projectsLabels = projectsData.data.projects.map((project) => project.name);
-      const projectsValues = projectsData.data.projects.map((project) => project.total_seconds / 3600);
+      // Projects
+      const projectsLabels = languageData.data.projects.map((p) => p.name);
+      const projectsValues = languageData.data.projects.map((p) => p.total_seconds / 3600);
       createChart("projectsChart", "bar", projectsLabels, projectsValues, "Projects Breakdown", {
         backgroundColor: ["#cc65fe", "#ffce56"],
         borderColor: ["#cc65fe", "#ffce56"],
       });
 
-      // Time distribution from WakaTime data
-      const timeDistData = await fetchWakaTimeData("/stats/last_7_days");
-      const timeDistLabels = ["Coding", "Debugging", "Learning", "Other"];
-      const timeDistValues = timeDistData.data.categories.map((cat) => cat.total_seconds / 3600);
-      createChart("timeDistributionChart", "pie", timeDistLabels, timeDistValues, "Time Distribution", {
+      // Time Distribution
+      const distLabels = ["Coding", "Debugging", "Learning", "Other"];
+      const distValues = languageData.data.categories.map((c) => c.total_seconds / 3600);
+      createChart("timeDistributionChart", "pie", distLabels, distValues, "Time Distribution", {
         backgroundColor: ["#ff6384", "#36a2eb", "#cc65fe", "#ffce56"],
         borderColor: ["#ff6384", "#36a2eb", "#cc65fe", "#ffce56"],
       });
     }
 
-    // Initial chart population
-    document.addEventListener("DOMContentLoaded", populateCharts);
+    // Simple GitHub-like calendar heatmap
+    function createCalendarHeatmap() {
+      const container = document.getElementById("heatmap-container");
+      // We'll show ~ 52 weeks, each with 7 days = 364 squares, approximate 1 year
+      // Each square assigned a random 'contribution' level for demo
+      const totalDays = 364;
+      for (let i = 0; i < totalDays; i++) {
+        const square = document.createElement("div");
+        square.classList.add("day-square");
 
-    // Heatmap Initialization
-    document.addEventListener("DOMContentLoaded", function () {
-      const heatmapContainer = document.getElementById("heatmap-container");
-      const heatmapInstance = h337.create({
-        container: heatmapContainer,
-      });
+        // Random intensity: 0 to 4
+        const level = Math.floor(Math.random() * 5);
+        if (level > 0) {
+          square.classList.add(`level-${level}`);
+        }
 
-      // Example heatmap data
-      const points = [];
-      const max = 100;
-      const width = heatmapContainer.offsetWidth;
-      const height = heatmapContainer.offsetHeight;
-      const len = 200;
-
-      while (len--) {
-        const val = Math.floor(Math.random() * max);
-        const point = {
-          x: Math.floor(Math.random() * width),
-          y: Math.floor(Math.random() * height),
-          value: val,
-        };
-        points.push(point);
+        container.appendChild(square);
       }
+    }
 
-      // Set heatmap data
-      heatmapInstance.setData({
-        max: max,
-        data: points,
-      });
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAuth();
+      populateCharts();
+      createCalendarHeatmap();
     });
   </script>
 </body>
