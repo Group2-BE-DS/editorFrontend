@@ -434,6 +434,39 @@
         </div>
     </div>
 
+    <!-- Add this before the closing body tag -->
+<div id="collaborationModal" class="modal">
+    <div class="modal-content">
+        <h3 class="text-lg font-bold mb-4 text-white">Collaboration Options</h3>
+        <div class="flex flex-col gap-4">
+            <button id="createRoomBtn" class="confirm w-full">Create New Room</button>
+            <button id="joinRoomBtn" class="confirm w-full">Join Existing Room</button>
+        </div>
+    </div>
+</div>
+
+<div id="createRoomModal" class="modal">
+    <div class="modal-content">
+        <h3 class="text-lg font-bold mb-4 text-white">Create Collaboration Room</h3>
+        <input type="email" id="collaboratorEmail" placeholder="Enter collaborator's email">
+        <div class="flex justify-end">
+            <button id="confirmCreateRoom" class="confirm">Create & Invite</button>
+            <button id="cancelCreateRoom" class="cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="joinRoomModal" class="modal">
+    <div class="modal-content">
+        <h3 class="text-lg font-bold mb-4 text-white">Join Collaboration Room</h3>
+        <input type="text" id="verificationCode" placeholder="Enter verification code">
+        <div class="flex justify-end">
+            <button id="confirmJoinRoom" class="confirm">Join Room</button>
+            <button id="cancelJoinRoom" class="cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
     <!-- Scripts -->
     <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
@@ -466,10 +499,10 @@
             let socket = null;
             let isCollaborating = false;
             let currentFile = null; // Stores { id, path }
-
+    
             const urlParams = new URLSearchParams(window.location.search);
             const repoId = urlParams.get('repoId');
-
+    
             async function fetchRepositoryName() {
                 if (!repoId) {
                     repoNameElement.textContent = "No repository selected";
@@ -491,7 +524,7 @@
                     repoNameElement.textContent = "Error loading repository";
                 }
             }
-
+    
             const editor = CodeMirror.fromTextArea(editorElement, {
                 lineNumbers: true,
                 mode: languageSelect.value,
@@ -502,7 +535,7 @@
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
                 lint: true,
             });
-
+    
             darkModeToggle.addEventListener('change', function () {
                 const isDark = this.checked;
                 document.documentElement.classList.toggle('dark', isDark);
@@ -510,7 +543,7 @@
                 settingsModal.classList.toggle('dark', isDark);
                 editor.setOption('theme', isDark ? 'dracula' : 'default');
             });
-
+    
             // Load initial file tree
             async function loadFileTree() {
                 try {
@@ -529,7 +562,7 @@
                     console.error('Error loading file tree:', error);
                 }
             }
-
+    
             function addFileToTree(file) {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item p-2 hover:bg-gray-700 rounded flex items-center';
@@ -559,19 +592,19 @@
                 
                 fileTree.querySelector('.file-tree').appendChild(fileItem);
             }
-
+    
             function showEditor() {
                 editorContainer.style.display = 'block';
                 noFileSelected.style.display = 'none';
             }
-
+    
             function hideEditor() {
                 editorContainer.style.display = 'none';
                 noFileSelected.style.display = 'flex';
                 currentFile = null;
                 currentFileName.textContent = 'No file selected';
             }
-
+    
             async function loadFileContent(fileId) {
                 try {
                     const token = sessionStorage.getItem('authToken');
@@ -585,6 +618,15 @@
                         // Set the language mode based on file extension
                         const fileExt = currentFile.path.split('.').pop().toLowerCase();
                         setLanguageMode(fileExt);
+    
+                        // Send openFile message to WebSocket
+                        if (socket && socket.readyState === WebSocket.OPEN) {
+                            socket.send(JSON.stringify({
+                                type: 'openFile',
+                                fileId: fileId,
+                                content: fileData.content
+                            }));
+                        }
                     } else {
                         console.error('Failed to load file:', await response.json());
                     }
@@ -592,7 +634,7 @@
                     console.error('Error loading file:', error);
                 }
             }
-
+    
             function setLanguageMode(fileExt) {
                 let mode = 'javascript'; // default
                 
@@ -614,7 +656,7 @@
                 languageSelect.value = mode;
                 editor.setOption('mode', mode);
             }
-
+    
             async function saveFile() {
                 if (currentFile) {
                     const content = editor.getValue();
@@ -630,9 +672,19 @@
                         });
                         if (response.ok) {
                             showSaveSuccess();
+    
+                            // Send codeUpdate message to WebSocket
+                            if (socket && socket.readyState === WebSocket.OPEN) {
+                                socket.send(JSON.stringify({
+                                    type: 'codeUpdate',
+                                    fileId: currentFile.id,
+                                    content: content
+                                }));
+                            }
                         } else {
-                            console.error('Failed to save file:', await response.json());
-                            alert('Failed to save file. Check console for details.');
+                            const errorData = await response.json();
+                            console.error('Failed to save file:', errorData);
+                            alert(`Failed to save file: ${JSON.stringify(errorData)}`);
                         }
                     } catch (error) {
                         console.error('Error saving file:', error);
@@ -642,14 +694,14 @@
                     alert('No file is currently open.');
                 }
             }
-
+    
             function showSaveSuccess() {
                 saveStatus.style.display = 'block';
                 setTimeout(() => {
                     saveStatus.style.display = 'none';
                 }, 2000);
             }
-
+    
             async function deleteFile(fileId, filePath) {
                 if (confirm(`Are you sure you want to delete ${filePath}?`)) {
                     try {
@@ -677,16 +729,16 @@
                     }
                 }
             }
-
+    
             createFileBtn.addEventListener('click', () => {
                 fileCreationModal.style.display = 'flex';
             });
-
+    
             cancelCreateFile.addEventListener('click', () => {
                 fileCreationModal.style.display = 'none';
                 fileNameInput.value = '';
             });
-
+    
             confirmCreateFile.addEventListener('click', async () => {
                 const fileName = fileNameInput.value.trim();
                 if (fileName && /^[a-zA-Z0-9._-]+$/.test(fileName)) { // Sanitize input
@@ -726,79 +778,34 @@
                     alert('Invalid file name. Use only letters, numbers, dots, underscores, or hyphens.');
                 }
             });
-
+    
             saveFileBtn.addEventListener('click', saveFile);
-
+    
             shareCodeBtn.addEventListener('click', function () {
                 if (!isCollaborating) {
-                    connectionStatus.textContent = 'Connecting...';
-                    connectionStatus.className = 'connection-status';
-                    connectionStatus.style.display = 'block';
-
-                    socket = new WebSocket('ws://localhost:8000/ws/editor/');
-
-                    socket.onopen = function () {
-                        isCollaborating = true;
-                        shareCodeBtn.classList.add('collaboration-active');
-                        shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
-                        connectionStatus.textContent = 'Connected!';
-                        connectionStatus.classList.add('connected');
-                        const initialCode = editor.getValue();
-                        if (initialCode && currentFile) {
-                            socket.send(JSON.stringify({ type: 'codeUpdate', content: initialCode, fileId: currentFile.id }));
-                        }
-                    };
-
-                    socket.onmessage = function (event) {
-                        const message = JSON.parse(event.data);
-                        if (message.type === 'update' && currentFile && message.fileId === currentFile.id && editor.getValue() !== message.content) {
-                            editor.setValue(message.content);
-                        }
-                    };
-
-                    socket.onerror = function (error) {
-                        console.error('WebSocket Error:', error);
-                        connectionStatus.textContent = 'Connection Failed!';
-                        connectionStatus.classList.add('error');
-                        setTimeout(() => connectionStatus.style.display = 'none', 3000);
-                    };
-
-                    socket.onclose = function () {
-                        isCollaborating = false;
-                        shareCodeBtn.classList.remove('collaboration-active');
-                        shareCodeBtn.querySelector('span').textContent = 'Share Code';
-                        connectionStatus.textContent = 'Disconnected';
-                        setTimeout(() => connectionStatus.style.display = 'none', 3000);
-                    };
-
-                    editor.on('change', debounce(function () {
-                        if (socket && socket.readyState === WebSocket.OPEN && currentFile) {
-                            const code = editor.getValue();
-                            socket.send(JSON.stringify({ type: 'codeUpdate', content: code, fileId: currentFile.id }));
-                        }
-                    }, 500));
+                    collaborationModal.style.display = 'flex';
                 } else {
                     if (socket) socket.close();
                 }
             });
-
+    
             settingsButton.addEventListener('click', () => {
                 settingsModal.classList.remove('hidden');
             });
-
+    
             closeSettings.addEventListener('click', () => {
                 settingsModal.classList.add('hidden');
             });
-
+    
             languageSelect.addEventListener('change', function () {
                 editor.setOption('mode', languageSelect.value);
                 editor.refresh();
             });
-
+    
             themeSelect.addEventListener('change', function () {
                 editor.setOption('theme', themeSelect.value);
             });
-
+    
             function debounce(func, delay) {
                 let timer;
                 return function (...args) {
@@ -806,9 +813,154 @@
                     timer = setTimeout(() => func.apply(this, args), delay);
                 };
             }
-
+    
             // Initialize
             fetchRepositoryName().then(loadFileTree);
+
+            // Add after the existing declarations in DOMContentLoaded
+            const collaborationModal = document.getElementById('collaborationModal');
+            const createRoomModal = document.getElementById('createRoomModal');
+            const joinRoomModal = document.getElementById('joinRoomModal');
+            const createRoomBtn = document.getElementById('createRoomBtn');
+            const joinRoomBtn = document.getElementById('joinRoomBtn');
+            const confirmCreateRoom = document.getElementById('confirmCreateRoom');
+            const cancelCreateRoom = document.getElementById('cancelCreateRoom');
+            const confirmJoinRoom = document.getElementById('confirmJoinRoom');
+            const cancelJoinRoom = document.getElementById('cancelJoinRoom');
+            const collaboratorEmail = document.getElementById('collaboratorEmail');
+            const verificationCode = document.getElementById('verificationCode');
+
+            // Update the shareCodeBtn click handler
+            shareCodeBtn.addEventListener('click', function() {
+                if (!isCollaborating) {
+                    collaborationModal.style.display = 'flex';
+                } else {
+                    if (socket) socket.close();
+                }
+            });
+
+            // Add handlers for room creation and joining
+            createRoomBtn.addEventListener('click', () => {
+                collaborationModal.style.display = 'none';
+                createRoomModal.style.display = 'flex';
+            });
+
+            joinRoomBtn.addEventListener('click', () => {
+                collaborationModal.style.display = 'none';
+                joinRoomModal.style.display = 'flex';
+            });
+
+            cancelCreateRoom.addEventListener('click', () => {
+                createRoomModal.style.display = 'none';
+                collaboratorEmail.value = '';
+            });
+
+            cancelJoinRoom.addEventListener('click', () => {
+                joinRoomModal.style.display = 'none';
+                verificationCode.value = '';
+            });
+
+            confirmCreateRoom.addEventListener('click', async () => {
+                const email = collaboratorEmail.value.trim();
+                if (!email) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/collab/generate-code/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${sessionStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({ emails: [email] })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        initializeWebSocket(data.code);
+                        createRoomModal.style.display = 'none';
+                        collaboratorEmail.value = '';
+                        alert('Invitation sent! Room created successfully.');
+                    } else {
+                        const error = await response.json();
+                        alert(`Failed to create room: ${error.error || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error('Error creating room:', error);
+                    alert('Failed to create room. Please try again.');
+                }
+            });
+
+            confirmJoinRoom.addEventListener('click', () => {
+                const code = verificationCode.value.trim();
+                if (!code) {
+                    alert('Please enter a verification code');
+                    return;
+                }
+
+                initializeWebSocket(code);
+                joinRoomModal.style.display = 'none';
+                verificationCode.value = '';
+            });
+
+            // Update the WebSocket initialization function
+            function initializeWebSocket(token) {
+                connectionStatus.textContent = 'Connecting...';
+                connectionStatus.className = 'connection-status';
+                connectionStatus.style.display = 'block';
+
+                // Debug log
+                console.log('Attempting to connect with token:', token);
+
+                const wsUrl = `ws://localhost:8000/ws/editor/?token=${encodeURIComponent(token)}`;
+                console.log('WebSocket URL:', wsUrl);
+
+                socket = new WebSocket(wsUrl);
+
+                socket.onopen = function() {
+                    console.log('WebSocket connection established');
+                    isCollaborating = true;
+                    shareCodeBtn.classList.add('collaboration-active');
+                    shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+                    connectionStatus.textContent = 'Connected!';
+                    connectionStatus.classList.add('connected');
+                    const initialCode = editor.getValue();
+                    if (initialCode && currentFile) {
+                        socket.send(JSON.stringify({ type: 'codeUpdate', content: initialCode, fileId: currentFile.id }));
+                    }
+                };
+
+                socket.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    if (message.type === 'update' && currentFile && message.fileId === currentFile.id && editor.getValue() !== message.content) {
+                        editor.setValue(message.content);
+                    }
+                };
+
+                socket.onerror = function(error) {
+                    console.error('WebSocket Error:', error);
+                    connectionStatus.textContent = 'Connection Failed!';
+                    connectionStatus.classList.add('error');
+                    setTimeout(() => connectionStatus.style.display = 'none', 3000);
+                };
+
+                socket.onclose = function() {
+                    isCollaborating = false;
+                    shareCodeBtn.classList.remove('collaboration-active');
+                    shareCodeBtn.querySelector('span').textContent = 'Share Code';
+                    connectionStatus.textContent = 'Disconnected';
+                    setTimeout(() => connectionStatus.style.display = 'none', 3000);
+                };
+
+                editor.on('change', debounce(function() {
+                    if (socket && socket.readyState === WebSocket.OPEN && currentFile) {
+                        const code = editor.getValue();
+                        socket.send(JSON.stringify({ type: 'codeUpdate', content: code, fileId: currentFile.id }));
+                    }
+                }, 500));
+            }
         });
     </script>
 </body>
