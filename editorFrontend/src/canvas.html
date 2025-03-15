@@ -499,6 +499,7 @@
             let socket = null;
             let isCollaborating = false;
             let currentFile = null; // Stores { id, path }
+            let currentRevision = 0; // Add this near the top of your DOMContentLoaded event handler
     
             const urlParams = new URLSearchParams(window.location.search);
             const repoId = urlParams.get('repoId');
@@ -645,29 +646,26 @@
                     const content = editor.getValue();
                     try {
                         const token = sessionStorage.getItem('authToken');
-                        const payload = {
-                            path: currentFile.path,  // Include the path field
-                            content: content
-                        };
-                        
-                        console.log('Saving file:', payload); // Debug log
-                        
+                        // Update the endpoint URL to match your backend
                         const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${currentFile.id}/`, {
-                            method: 'PUT',
+                            method: 'PATCH',  // Changed from POST to PATCH
                             headers: {
                                 'Content-Type': 'application/json',
                                 Authorization: `Token ${token}`,
                             },
-                            body: JSON.stringify(payload)
+                            body: JSON.stringify({
+                                content: content,
+                                path: currentFile.path  // Include the path
+                            })
                         });
                         
                         if (response.ok) {
                             showSaveSuccess();
         
-                            // Send codeUpdate message to WebSocket
+                            // After successful save, notify WebSocket
                             if (socket && socket.readyState === WebSocket.OPEN) {
                                 socket.send(JSON.stringify({
-                                    type: 'codeUpdate',
+                                    type: 'codeUpdate',  // Changed from 'fileUpdated' to 'codeUpdate'
                                     fileId: currentFile.id,
                                     content: content
                                 }));
@@ -675,7 +673,7 @@
                         } else {
                             const errorData = await response.json();
                             console.error('Failed to save file:', errorData);
-                            alert(`Failed to save file: ${JSON.stringify(errorData)}`);
+                            alert(`Failed to save file: ${errorData.detail || 'Unknown error'}`);
                         }
                     } catch (error) {
                         console.error('Error saving file:', error);
@@ -925,8 +923,14 @@
 
                     switch(message.type) {
                         case 'update':
-                            if (currentFile && message.fileId === currentFile.id && editor.getValue() !== message.content) {
-                                editor.setValue(message.content);
+                        case 'codeUpdate':  // Changed from 'fileUpdated' to 'codeUpdate'
+                            if (currentFile && message.fileId === currentFile.id) {
+                                const currentPos = editor.getCursor();
+                                if (editor.getValue() !== message.content) {
+                                    editor.setValue(message.content);
+                                    editor.setCursor(currentPos);  // Preserve cursor position
+                                }
+                                currentRevision = message.revision || currentRevision;
                             }
                             break;
                         case 'fileData':
@@ -934,6 +938,7 @@
                             if (currentFile && message.fileId === currentFile.id) {
                                 console.log('Setting editor content:', message.content); // Debug log
                                 editor.setValue(message.content || '');
+                                currentRevision = message.revision || 0;  // Reset revision counter
                                 showEditor();
                             }
                             break;
@@ -962,11 +967,28 @@
                     shareCodeBtn.querySelector('span').textContent = 'Share Code';
                     connectionStatus.textContent = 'Disconnected';
                     setTimeout(() => connectionStatus.style.display = 'none', 3000);
+                    
+                    // Attempt to reconnect if not explicitly closed
+                    if (!isCollaborating) {
+                        setTimeout(() => initializeWebSocket(token), 3000);
+                    }
                 };
             }
 
             // Initialize WebSocket connection when page loads
             initializeWebSocket();
+
+            // Update the editor change handler
+            editor.on('change', debounce(function(cm, change) {
+                if (socket && socket.readyState === WebSocket.OPEN && currentFile) {
+                    socket.send(JSON.stringify({
+                        type: 'codeUpdate',  // Changed from 'fileUpdated' to 'codeUpdate'
+                        fileId: currentFile.id,
+                        content: editor.getValue(),
+                        revision: currentRevision++
+                    }));s
+                }
+            }, 500));
 
             // Initialize
             fetchRepositoryName().then(loadFileTree);
