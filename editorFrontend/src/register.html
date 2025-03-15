@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +7,46 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.css" rel="stylesheet" />
-</head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<body class="bg-gray-900 text-white">
-  <div class="h-screen flex items-center justify-center">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+  <!-- Theme Toggle -->
+  <div class="absolute top-4 right-4">
+    <button id="theme-toggle"
+            class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400">
+      <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+      <i class="fas fa-moon text-blue-300 hidden dark:inline"></i>
+    </button>
+  </div>
+
+  <!-- Toast for success -->
+  <div id="success-toast"
+       class="hidden fixed top-16 right-4 z-50 bg-green-600 text-white px-6 py-4 rounded-lg shadow-md">
+    Account created! Please 
+    <a id="toast-login-link" href="login.html" class="underline font-bold">Login here</a>.
+  </div>
+
+  <div class="h-screen flex items-center justify-center p-6">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-      
       <!-- C.C.C App Name -->
       <div class="text-center mb-6">
         <h1 class="text-4xl font-semibold text-blue-600 dark:text-blue-500">C.C.C</h1>
@@ -23,58 +57,95 @@
       <form id="register-form">
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium">Email Address</label>
-          <input type="email" id="email" name="email" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+          <input type="email" id="email" name="email"
+                 class="mt-1 block w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
+                 required>
         </div>
 
         <div class="mb-4">
           <label for="username" class="block text-sm font-medium">Username</label>
-          <input type="text" id="username" name="username" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+          <input type="text" id="username" name="username"
+                 class="mt-1 block w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
+                 required>
         </div>
 
         <div class="mb-4">
           <label for="password1" class="block text-sm font-medium">Password</label>
-          <input type="password" id="password1" name="password1" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+          <input type="password" id="password1" name="password1"
+                 class="mt-1 block w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
+                 required>
         </div>
 
         <div class="mb-6">
           <label for="password2" class="block text-sm font-medium">Confirm Password</label>
-          <input type="password" id="password2" name="password2" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md" required>
+          <input type="password" id="password2" name="password2"
+                 class="mt-1 block w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
+                 required>
         </div>
 
-        <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">Sign Up</button>
+        <button type="submit"
+                class="w-full py-3 px-6 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+          Sign Up
+        </button>
 
         <div class="mt-4 text-center">
-          <p class="text-sm">Already have an account? <a href="login.html" class="text-blue-600 hover:text-blue-500">Login here</a></p>
+          <p class="text-sm text-blue-600 dark:text-blue-400">
+            Already have an account? 
+            <a href="login.html" class="hover:underline">Login here</a>
+          </p>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    document.getElementById('register-form').addEventListener('submit', async function (event) {
+    // Theme management
+    const themeToggle = document.getElementById('theme-toggle');
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    // Registration form handler
+    document.getElementById('register-form').addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
-      const password1 = document.getElementById('password1').value;
-      const password2 = document.getElementById('password2').value;
-
-      const data = { username, email, password1, password2 };
+      const data = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password1: document.getElementById('password1').value,
+        password2: document.getElementById('password2').value
+      };
 
       try {
         const response = await fetch('http://127.0.0.1:8000/auth/registration/', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-
         const result = await response.json();
 
         if (response.ok) {
           localStorage.setItem('authToken', result.key);
-          window.location.href = 'index.html';
+          // Show success toast
+          const toast = document.getElementById('success-toast');
+          toast.classList.remove('hidden');
+
+          // Auto-redirect after 5 minutes if not clicked
+          let redirectTimer = setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 5 * 60 * 1000);
+
+          // Cancel redirect if user clicks the link
+          document.getElementById('toast-login-link').addEventListener('click', () => {
+            clearTimeout(redirectTimer);
+          });
         } else {
           alert('Error: ' + JSON.stringify(result));
         }
