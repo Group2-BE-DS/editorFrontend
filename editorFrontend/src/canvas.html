@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Add these dark mode styles */
+        :root {
+            color-scheme: dark;
+        }
+
+        html.dark {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark .CodeMirror {
+            background-color: #282a36;
+            color: #f8f8f2;
+            border-color: #4a5568;
+        }
+
+        .dark #sidebar-multi-level-sidebar {
+            background-color: #2d3748;
+        }
+
+        .dark .modal-content {
+            background-color: #2d3748;
+            color: #ffffff;
+        }
+
+        .dark input, .dark select {
+            background-color: #1a202c;
+            color: #ffffff;
+            border-color: #4a5568;
+        }
+
+        .dark .file-item:hover,
+        .dark .folder-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         /* Your existing styles remain unchanged */
         .CodeMirror {
             height: 90vh;
-            border: 1px solid #ddd;
+            border: 1px solid #4a5568;
             border-radius: 0.5rem;
         }
 
@@ -284,7 +325,7 @@
         }
     </style>
 </head>
-<body class="dark">
+<body >
     <div id="connectionStatus" class="connection-status">
         Connecting...
     </div>
@@ -541,13 +582,16 @@
             const editor = CodeMirror.fromTextArea(editorElement, {
                 lineNumbers: true,
                 mode: languageSelect.value,
-                theme: themeSelect.value,
+                theme: 'dracula', // Set dark theme as default
                 matchBrackets: true,
                 lineWrapping: true,
                 foldGutter: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
                 lint: true,
             });
+    
+            // Make sure dark mode toggle is checked by default
+            darkModeToggle.checked = true;
     
             darkModeToggle.addEventListener('change', function () {
                 const isDark = this.checked;
