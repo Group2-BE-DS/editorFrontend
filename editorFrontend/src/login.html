@@ -1,123 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - C.C.C</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.css" rel="stylesheet" />
-  <style>
-    body {
-      transition: background-color 0.3s, color 0.3s;
-    }
-  </style>
-</head>
-<body class="bg-gray-900 text-white dark:bg-gray-900 dark:text-white">
-  <div class="flex justify-end p-4">
-    <button id="theme-toggle" class="text-gray-400 dark:text-gray-200">
-      <svg id="sun-icon" class="w-6 h-6 dark:hidden" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 4V2m0 20v-2m8-8h2m-20 0h2m14.142-6.142l1.414-1.414m-16.97 0l1.414 1.414m0 12.728l1.414 1.414m16.97 0l1.414-1.414M12 9a3 3 0 11-3 3 3 3 0 013-3z"></path>
-      </svg>
-      <svg id="moon-icon" class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3C8.13 3 5 6.13 5 9.97c0 2.55 1.35 4.77 3.33 6.04-1.41 2.35-1.23 5.26.43 7.29 2.01 2.44 5.5 2.09 7.53-.59 2.27-2.46 1.57-6.29-.66-8.24 1.51-1.12 2.33-2.89 2.33-4.91 0-3.87-3.13-7-7-7z"></path>
-      </svg>
-    </button>
-  </div>
-
-  <div class="h-screen flex items-center justify-center">
-    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-      <div class="text-center mb-6">
-        <h1 class="text-4xl font-semibold text-blue-600 dark:text-blue-500">C.C.C</h1>
-        <p class="text-xl text-gray-500 dark:text-gray-400">Welcome back! Please login to your account.</p>
-      </div>
-
-      <!-- Error Message -->
-      <div id="error-message" class="hidden text-red-500 text-sm mb-4"></div>
-
-      <!-- Login Form -->
-      <form id="login-form">
-        <div class="mb-4">
-          <label for="username" class="block text-sm font-medium">Username</label>
-          <input type="text" id="username" name="username" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your username" required>
-        </div>
-
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium">Email Address</label>
-          <input type="email" id="email" name="email" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your email" required>
-        </div>
-
-        <div class="mb-6">
-          <label for="password" class="block text-sm font-medium">Password</label>
-          <input type="password" id="password" name="password" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your password" required>
-        </div>
-
-        <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Login</button>
-
-        <div class="mt-4 text-center">
-          <p class="text-sm">Don't have an account? <a href="register.html" class="text-blue-600 hover:text-blue-500">Sign Up</a></p>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    // Theme toggle functionality
-    const toggleButton = document.getElementById("theme-toggle");
-    const sunIcon = document.getElementById("sun-icon");
-    const moonIcon = document.getElementById("moon-icon");
-
-    toggleButton.addEventListener("click", () => {
-      document.documentElement.classList.toggle("dark");
-      sunIcon.classList.toggle("hidden");
-      moonIcon.classList.toggle("hidden");
-    });
-
-    // Login handling
-    document.getElementById("login-form").addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const username = document.getElementById("username").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const errorMessage = document.getElementById("error-message");
-
-      const credentials = {
-        username: username, // Include the username field
-        email: email,       // Include the email field
-        password: password
-      };
-
-      try {
-        const response = await fetch("http://127.0.0.1:8000/auth/login/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(credentials)
-        });
-
-        if (!response.ok) {
-          throw new Error("Login failed");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - C.C.C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E293B'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth transitions for all elements */
+        * {
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
-        const data = await response.json();
-        const token = data.key; // 'key' is the token returned by dj-rest-auth
+        .form-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
+        .theme-transition {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
+    <!-- Theme Toggle -->
+    <div class="absolute top-4 right-4">
+        <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400">
+            <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+            <i class="fas fa-moon text-blue-300 hidden dark:inline"></i>
+        </button>
+    </div>
 
-        // Store the token and user information in session storage
-        sessionStorage.setItem("authToken", token);
+    <!-- Login Container -->
+    <div class="flex items-center justify-center min-h-screen p-6">
+        <div class="form-container w-full max-w-md">
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-primary mb-2">C.C.C</h1>
+                <p class="text-gray-600 dark:text-gray-400">Welcome back!</p>
+            </div>
 
-        window.location.href = "index.html";
+            <!-- Login Form -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <div id="error-message" class="hidden mb-4 p-3 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300"></div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
+                        <input type="text" id="username" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-transparent focus:border-primary dark:focus:border-primary focus:ring-2 focus:ring-primary/20 dark:text-white" 
+                               placeholder="Enter your username">
+                    </div>
 
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                        <input type="email" id="email" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-transparent focus:border-primary dark:focus:border-primary focus:ring-2 focus:ring-primary/20 dark:text-white" 
+                               placeholder="Enter your email">
+                    </div>
 
-        console.log("Login successful, data stored in session storage");
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                        <input type="password" id="password" 
+                               class="w-full px-4 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-transparent focus:border-primary dark:focus:border-primary focus:ring-2 focus:ring-primary/20 dark:text-white" 
+                               placeholder="Enter your password">
+                    </div>
 
-        // Redirect to the index page after successful login
-      } catch (error) {
-        console.error("Error:", error);
-        errorMessage.textContent = "Login failed. Please check your credentials.";
-        errorMessage.classList.remove("hidden");
-      }
-    });
-  </script>
+                    <button type="submit" 
+                            class="w-full py-3 px-6 rounded-lg bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white font-medium">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Don't have an account? 
+                        <a href="register.html" class="text-primary hover:text-primary/80 font-medium">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme management
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Check for saved theme or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Theme toggle handler
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+
+                if (!response.ok) throw new Error('Login failed');
+
+                const data = await response.json();
+                sessionStorage.setItem('authToken', data.key);
+                window.location.href = 'index.html';
+            } catch (error) {
+                errorMessage.textContent = 'Invalid credentials. Please try again.';
+                errorMessage.classList.remove('hidden');
+                setTimeout(() => errorMessage.classList.add('hidden'), 5000);
+            }
+        });
+    </script>
 </body>
 </html>
