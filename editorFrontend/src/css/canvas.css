@@ -1,0 +1,315 @@
+
+/* Add these dark mode styles */
+:root {
+    color-scheme: dark;
+}
+
+html.dark {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.dark body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.dark .CodeMirror {
+    background-color: #282a36;
+    color: #f8f8f2;
+    border-color: #4a5568;
+}
+
+.dark #sidebar-multi-level-sidebar {
+    background-color: #2d3748;
+}
+
+.dark .modal-content {
+    background-color: #2d3748;
+    color: #ffffff;
+}
+
+.dark input, .dark select {
+    background-color: #1a202c;
+    color: #ffffff;
+    border-color: #4a5568;
+}
+
+.dark .file-item:hover,
+.dark .folder-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Your existing styles remain unchanged */
+.CodeMirror {
+    height: 90vh;
+    border: 1px solid #4a5568;
+    border-radius: 0.5rem;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.file-tree {
+    margin-left: 1rem;
+}
+
+.file-item,
+.folder-item {
+    padding: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-item:hover,
+.folder-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #2196F3;
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+.collaboration-active {
+    background-color: #22c55e !important;
+}
+
+.dark body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.dark .CodeMirror {
+    border-color: #4a5568;
+}
+
+html:not(.dark) #sidebar-multi-level-sidebar {
+    background-color: #f8f9fa;
+    color: #1a1a1a;
+}
+
+html:not(.dark) #sidebar-multi-level-sidebar .text-white {
+    color: #1a1a1a;
+}
+
+html:not(.dark) #sidebar-multi-level-sidebar .hover\:bg-gray-700:hover {
+    background-color: #e2e8f0;
+}
+
+html:not(.dark) #sidebar-multi-level-sidebar .bg-gray-800 {
+    background-color: #f8f9fa;
+}
+
+html:not(.dark) #sidebar-multi-level-sidebar .border-gray-700 {
+    border-color: #e2e8f0;
+}
+
+.folder-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.folder-content.expanded {
+    max-height: 500px;
+}
+
+.folder-item i.fa-chevron-right {
+    transition: transform 0.3s ease;
+}
+
+.folder-item.expanded i.fa-chevron-right {
+    transform: rotate(90deg);
+}
+
+.connection-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    z-index: 50;
+    display: none;
+}
+
+.connection-status.connected {
+    display: block;
+    background-color: #22c55e;
+    color: white;
+}
+
+.connection-status.error {
+    display: block;
+    background-color: #ef4444;
+    color: white;
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid;
+    margin-bottom: 1rem;
+}
+
+.repo-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #4a5568;
+    margin-bottom: 1rem;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #2d3748;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #4a5568;
+    background-color: #1a202c;
+    color: white;
+}
+
+.modal-content button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-content button.confirm {
+    background-color: #4299e1;
+    color: white;
+}
+
+.modal-content button.cancel {
+    background-color: #718096;
+    color: white;
+    margin-left: 0.5rem;
+}
+
+.file-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+#editorContainer {
+    display: none;
+}
+
+.save-success {
+    background-color: #22c55e;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    display: none;
+}
+
+.file-item.active {
+    background-color: rgba(66, 153, 225, 0.3) !important;
+    border-radius: 0.25rem;
+}
+
+.folder-container {
+    margin-left: 1rem;
+}
