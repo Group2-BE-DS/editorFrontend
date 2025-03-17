@@ -1102,31 +1102,28 @@
                         case 'update':
                         case 'fileUpdated':
                             if (currentFile && message.fileId === currentFile.id) {
-                                const currentPos = editor.getCursor();
-                                if (editor.getValue() !== message.content) {
-                                    editor.setValue(message.content);
-                                    editor.setCursor(currentPos);  // Preserve cursor position
-                                }
-                                currentRevision = message.revision || currentRevision;
+                                handleContentUpdate(message.content, message.revision);
                             }
                             break;
+
                         case 'fileData':
-                            console.log('Received file data:', message); // Debug log
                             if (currentFile && message.fileId === currentFile.id) {
-                                console.log('Setting editor content:', message.content); // Debug log
-                                editor.setValue(message.content || '');
-                                currentRevision = message.revision || 0;  // Reset revision counter
-                                showEditor();
+                                handleInitialFileLoad(message);
                             }
                             break;
+
                         case 'collaboration_started':
-                            isCollaborating = true;
-                            shareCodeBtn.classList.add('collaboration-active');
-                            shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+                            handleCollaborationStart();
                             break;
+
+                        case 'cursor_update':
+                            if (currentFile && message.fileId === currentFile.id) {
+                                handleCollaboratorCursor(message);
+                            }
+                            break;
+
                         case 'error':
-                            console.error('Server error:', message.message);
-                            alert(message.message);
+                            handleError(message);
                             break;
                     }
                 };
@@ -1145,6 +1142,85 @@
                     connectionStatus.textContent = 'Disconnected';
                     setTimeout(() => connectionStatus.style.display = 'none', 3000);
                 };
+            }
+
+            // Add these helper functions
+            function handleContentUpdate(newContent, revision) {
+                // Store current state
+                const scrollInfo = editor.getScrollInfo();
+                const selections = editor.listSelections();
+                const cursor = editor.getCursor();
+                
+                // Only update if content is different
+                if (editor.getValue() !== newContent) {
+                    editor.setValue(newContent);
+                    currentRevision = revision || currentRevision;
+                    
+                    // Restore state
+                    editor.setCursor(cursor);
+                    editor.scrollTo(scrollInfo.left, scrollInfo.top);
+                    editor.setSelections(selections);
+                }
+            }
+
+            function handleInitialFileLoad(message) {
+                console.log('Loading initial file data:', message);
+                editor.setValue(message.content || '');
+                currentRevision = message.revision || 0;
+                showEditor();
+                
+                // Set language mode based on file extension
+                if (currentFile && currentFile.path) {
+                    const ext = currentFile.path.split('.').pop().toLowerCase();
+                    setLanguageMode(ext);
+                }
+            }
+
+            function handleCollaborationStart() {
+                isCollaborating = true;
+                shareCodeBtn.classList.add('collaboration-active');
+                shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+                
+                // Show collaboration indicator
+                connectionStatus.textContent = 'Collaboration Active';
+                connectionStatus.classList.add('connected');
+                setTimeout(() => {
+                    connectionStatus.style.opacity = '0';
+                    setTimeout(() => connectionStatus.style.display = 'none', 300);
+                }, 2000);
+            }
+
+            function handleCollaboratorCursor(message) {
+                // Remove existing cursor for this collaborator
+                const existingCursor = document.querySelector(`.collaborator-cursor-${message.userId}`);
+                if (existingCursor) existingCursor.remove();
+                
+                // Create new cursor element
+                const cursorElement = document.createElement('div');
+                cursorElement.className = `collaborator-cursor-${message.userId}`;
+                cursorElement.style.position = 'absolute';
+                cursorElement.style.borderLeft = '2px solid #00ff00';
+                cursorElement.style.height = '1.2em';
+                
+                // Position the cursor
+                const pos = editor.charCoords(message.cursor, 'local');
+                cursorElement.style.left = `${pos.left}px`;
+                cursorElement.style.top = `${pos.top}px`;
+                
+                editor.getWrapperElement().appendChild(cursorElement);
+                
+                // Remove cursor after inactivity
+                setTimeout(() => cursorElement.remove(), 3000);
+            }
+
+            function handleError(message) {
+                console.error('Server error:', message.message);
+                connectionStatus.textContent = message.message;
+                connectionStatus.classList.add('error');
+                setTimeout(() => {
+                    connectionStatus.classList.remove('error');
+                    connectionStatus.style.display = 'none';
+                }, 3000);
             }
 
             // Initialize WebSocket connection when page loads
