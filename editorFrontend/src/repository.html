@@ -346,7 +346,7 @@
 
       // Update the "View Details" link to include the repository ID
       const viewDetailsLink = newRepoCard.querySelector('a[href="#"]');
-      viewDetailsLink.href = `pages/canvas.html?repoId=${repo.id}`; // Pass repository ID as a query parameter
+      viewDetailsLink.href = `canvas.html?repoId=${repo.id}`; // Pass repository ID as a query parameter
 
       document.getElementById("repositoryCards").insertBefore(newRepoCard, createRepoCard);
     }
