@@ -412,8 +412,7 @@
                     <span class="tooltiptext">AI-powered code generation</span>
                 </div>
                 <div class="tooltip w-full">
-                    <button onclick="window.open('https://readme-ai.streamlit.app/', '_blank')"
-                        class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
+                    <button id="generateDocsBtn" class="w-full text-white hover:bg-gray-700 p-2 rounded text-left flex items-center gap-2">
                         <i class="fas fa-file-alt"></i>
                         <span>Generate Docs</span>
                     </button>
@@ -706,22 +705,135 @@
     
             // Load initial file tree
             async function loadFileTree() {
-                try {
-                    const token = sessionStorage.getItem('authToken');
-                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
-                        headers: { Authorization: `Token ${token}` },
-                    });
-                    if (response.ok) {
-                        const files = await response.json();
-                        fileTree.querySelector('.file-tree').innerHTML = '';
-                        files.forEach(file => addFileToTree(file));
-                    } else {
-                        console.error('Failed to load file tree:', await response.json());
-                    }
-                } catch (error) {
-                    console.error('Error loading file tree:', error);
-                }
+    try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+            headers: { Authorization: `Token ${token}` },
+        });
+        if (response.ok) {
+            const files = await response.json();
+            fileTree.querySelector('.file-tree').innerHTML = '';
+            files.forEach(file => addFileToTree(file));
+            // Optionally auto-open the first file
+            if (files.length > 0 && !currentFile) {
+                currentFile = { id: files[0].id, path: files[0].path };
+                currentFileName.textContent = files[0].path;
+                loadFileContent(files[0].id);
             }
+        } else {
+            console.error('Failed to load file tree:', await response.json());
+        }
+    } catch (error) {
+        console.error('Error loading file tree:', error);
+    }
+}
+async function generateDocs() {
+    console.log('Generate Docs button clicked');
+    console.log('repoId:', repoId, 'authToken:', sessionStorage.getItem('authToken'));
+
+    try {
+        const token = sessionStorage.getItem('authToken');
+        if (!token) throw new Error('No auth token found');
+        if (!repoId) throw new Error('No repoId defined');
+
+        console.log('Fetching repository contents...');
+        const contentsResponse = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/contents/`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Token ${token}`,
+            },
+        });
+
+        if (!contentsResponse.ok) {
+            const errorData = await contentsResponse.json();
+            throw new Error(`Failed to fetch contents: ${errorData.error || 'Unknown error'} (Status: ${contentsResponse.status})`);
+        }
+
+        const repoData = await contentsResponse.json();
+        console.log('Repository contents:', repoData);
+
+        const prompt = `
+Generate a comprehensive README.md for a repository named "${repoData.name}" with description "${repoData.description || 'No description provided'}". Below are the files and their contents in JSON format. Analyze them and create a full-fledged documentation in markdown, including project overview, file descriptions, and usage instructions where applicable.
+
+Files:
+${JSON.stringify(repoData.files, null, 2)}
+
+Return the markdown content directly, without any additional explanation or wrapping.
+`;
+        console.log('Prompt prepared:', prompt.substring(0, 200) + '...');
+
+        console.log('Sending request to Gemini API...');
+        const geminiResponse = await fetch(
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR-API-KEY',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [
+                                { text: prompt }
+                            ]
+                        }
+                    ],
+                    generationConfig: {
+                        maxOutputTokens: 1000,
+                        temperature: 0.7,
+                    },
+                }),
+            }
+        );
+
+        if (!geminiResponse.ok) {
+            const errorData = await geminiResponse.json();
+            throw new Error(`Gemini request failed: ${errorData.error.message || 'Unknown error'} (Status: ${geminiResponse.status})`);
+        }
+
+        const geminiData = await geminiResponse.json();
+        if (!geminiData.candidates || !geminiData.candidates[0].content.parts[0].text) {
+            throw new Error('Invalid Gemini response: No content generated');
+        }
+        const generatedContent = geminiData.candidates[0].content.parts[0].text.trim();
+        console.log('Generated README content:', generatedContent);
+
+        console.log('Saving README.md to backend...');
+        const saveResponse = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Token ${token}`,
+            },
+            body: JSON.stringify({
+                path: 'README.md',
+                content: generatedContent,
+            }),
+        });
+
+        if (!saveResponse.ok) {
+            const errorData = await saveResponse.json();
+            throw new Error(`Failed to save README: ${errorData.error || 'Unknown error'} (Status: ${saveResponse.status})`);
+        }
+
+        const newFile = await saveResponse.json();
+        console.log('Saved README:', newFile);
+
+        console.log('Updating UI with new README...');
+        addFileToTree(newFile);
+        currentFile = { id: newFile.id, path: newFile.path };
+        currentFileName.textContent = newFile.path;
+        editor.setValue(newFile.content || '');
+        setLanguageMode('md');
+        updateFileLanguage(newFile.path);
+        showEditor();
+        alert('Documentation generated successfully!');
+
+    } catch (error) {
+        console.error('Error in generateDocs:', error.message);
+        alert(`Error generating documentation: ${error.message}`);
+    }
+}   
     
             // Replace the existing addFileToTree function
             function addFileToTree(file) {
@@ -817,7 +929,7 @@
                 languageSelect.value = mode;
                 editor.setOption('mode', mode);
             }
-    
+
             async function saveFile() {
                 if (currentFile) {
                     const content = editor.getValue();
@@ -946,6 +1058,18 @@
             });
     
             saveFileBtn.addEventListener('click', saveFile);
+
+            console.log('Binding Generate Docs button...');
+const generateDocsBtn = document.getElementById('generateDocsBtn');
+if (!generateDocsBtn) {
+    console.error('Generate Docs button not found in DOM');
+} else {
+    console.log('Generate Docs button found:', generateDocsBtn);
+    generateDocsBtn.addEventListener('click', () => {
+        console.log('Button clicked, calling generateDocs');
+        generateDocs();
+    });
+}
     
             shareCodeBtn.addEventListener('click', function () {
                 if (!isCollaborating) {
@@ -1311,12 +1435,48 @@
             });
 
             // Update file language when file is loaded
-            function loadFileContent(fileId) {
-                // ...existing code...
-                if (currentFile) {
-                    updateFileLanguage(currentFile.path);
-                }
-            }
+            async function loadFileContent(fileId) {
+    console.log('Loading file:', fileId);  // Debug log
+
+    // Step 1: Fetch content directly from REST API
+    try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileId}/`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Token ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            const fileData = await response.json();
+            console.log('Fetched file data:', fileData);  // Debug log
+            editor.setValue(fileData.content || '');  // Set editor content
+            currentRevision = 0;  // Reset revision for WebSocket sync
+            setLanguageMode(fileData.path.split('.').pop().toLowerCase());  // Set language
+            updateFileLanguage(fileData.path);  // Update status bar
+            showEditor();  // Ensure editor is visible
+        } else {
+            console.error('Failed to fetch file content:', await response.json());
+            alert('Failed to load file content. Check console for details.');
+            return;
+        }
+    } catch (error) {
+        console.error('Error fetching file content:', error);
+        alert('Error loading file content. Check console for details.');
+        return;
+    }
+
+    // Step 2: Request WebSocket sync (if connected)
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: 'openFile',
+            fileId: fileId
+        }));
+    } else {
+        console.warn('WebSocket not connected; relying on REST API fetch');
+    }
+}
 
             // Add this inside your DOMContentLoaded event listener
             const historyToggle = document.getElementById('historyToggle');
