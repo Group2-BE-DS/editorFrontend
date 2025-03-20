@@ -480,6 +480,43 @@
         .preview-container th {
             background-color: #44475a;
         }
+
+        /* Add this to your existing styles */
+        .file-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+            background-color: rgba(45, 55, 72, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 0.5rem;
+        }
+
+        .file-header .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-header .file-icon {
+            color: #a0aec0;
+        }
+
+        .file-header .file-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .file-header .file-ext {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            padding: 0.2rem 0.5rem;
+            background-color: rgba(74, 85, 104, 0.4);
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body >
@@ -652,8 +689,12 @@
     </div>
 
     <div id="editorContainer" class="p-4 sm:ml-64">
-        <div class="flex items-center gap-2 mb-2">
-            <span id="currentFileName">No file selected</span>
+        <div class="file-header">
+            <div class="file-info">
+                <i class="fas fa-file-code file-icon"></i>
+                <span id="currentFileName" class="file-name">No file selected</span>
+                <span id="fileExtension" class="file-ext"></span>
+            </div>
             <button id="markdownToggle" class="markdown-toggle px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white text-sm">
                 <i class="fas fa-eye"></i> Preview
             </button>
@@ -744,6 +785,18 @@
         </div>
     </div>
 </div>
+
+    <!-- Add this for the collaborators list -->
+    <div id="collaboratorsPanel" class="fixed right-4 top-4 bg-gray-800 dark:bg-gray-800 rounded-lg shadow-lg p-4 hidden z-40">
+        <div class="flex items-center justify-between mb-3 border-b border-gray-700 pb-2">
+            <h3 class="text-white font-semibold flex items-center">
+                <i class="fas fa-users mr-2"></i>
+                Connected Users
+            </h3>
+            <span id="userCount" class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full"></span>
+        </div>
+        <div id="collaboratorsList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+    </div>
 
     <!-- Scripts -->
     <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
@@ -1411,18 +1464,20 @@ if (!generateDocsBtn) {
                 }
             }
 
-            function handleCollaborationStart() {
+            function handleCollaborationStart(users = []) {
                 isCollaborating = true;
                 shareCodeBtn.classList.add('collaboration-active');
                 shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
                 
-                // Show collaboration indicator
-                connectionStatus.textContent = 'Collaboration Active';
-                connectionStatus.classList.add('connected');
-                setTimeout(() => {
-                    connectionStatus.style.opacity = '0';
-                    setTimeout(() => connectionStatus.style.display = 'none', 300);
-                }, 2000);
+                // Show collaborators panel
+                const collaboratorsPanel = document.getElementById('collaboratorsPanel');
+                collaboratorsPanel.classList.remove('hidden');
+                
+                // Update users count
+                document.getElementById('userCount').textContent = `${users.length} online`;
+                
+                // Update the collaborators list
+                updateCollaboratorsList(users);
             }
 
             function handleCollaboratorCursor(message) {
@@ -1690,6 +1745,102 @@ if (!generateDocsBtn) {
             // Add history maintenance check periodically
             setInterval(maintainHistory, 60000); // Check every minute
         });
+
+        // Add these functions to your existing script
+        function updateFileName(filePath) {
+            const currentFileName = document.getElementById('currentFileName');
+            const fileExtension = document.getElementById('fileExtension');
+            
+            if (!filePath) {
+                currentFileName.textContent = 'No file selected';
+                fileExtension.textContent = '';
+                return;
+            }
+            
+            const parts = filePath.split('.');
+            const ext = parts.pop();
+            const name = parts.join('.');
+            
+            currentFileName.textContent = name;
+            fileExtension.textContent = `.${ext}`;
+            
+            // Update the file icon based on extension
+            const fileIcon = document.querySelector('.file-icon');
+            const iconClass = getFileIcon(ext);
+            fileIcon.className = `${iconClass} file-icon`;
+        }
+
+        function getFileIcon(ext) {
+            const iconMap = {
+                'js': 'fab fa-js',
+                'py': 'fab fa-python',
+                'html': 'fab fa-html5',
+                'css': 'fab fa-css3',
+                'md': 'fas fa-markdown',
+                'json': 'fas fa-code',
+                'txt': 'fas fa-file-alt'
+            };
+            return iconMap[ext] || 'fas fa-file-code';
+        }
+
+        // Update the handleCollaborationStart function
+        function handleCollaborationStart(users = []) {
+            isCollaborating = true;
+            shareCodeBtn.classList.add('collaboration-active');
+            shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
+            
+            // Show collaborators panel
+            const collaboratorsPanel = document.getElementById('collaboratorsPanel');
+            collaboratorsPanel.classList.remove('hidden');
+            
+            // Update users count
+            document.getElementById('userCount').textContent = `${users.length} online`;
+            
+            // Update the collaborators list
+            updateCollaboratorsList(users);
+        }
+
+        function updateCollaboratorsList(users) {
+            const collaboratorsList = document.getElementById('collaboratorsList');
+            collaboratorsList.innerHTML = '';
+            
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'flex items-center gap-2 p-2 rounded bg-gray-700';
+                userElement.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-white text-sm">${user.name || 'Anonymous'}</span>
+                `;
+                collaboratorsList.appendChild(userElement);
+            });
+        }
+
+        // Update your socket message handler
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            
+            switch(message.type) {
+                // ...existing cases...
+                
+                case 'users_update':
+                    updateCollaboratorsList(message.users);
+                    document.getElementById('userCount').textContent = `${message.users.length} online`;
+                    break;
+            }
+        };
+
+        // Update the loadFileContent function to include file name update
+        async function loadFileContent(fileId) {
+            // ...existing code...
+            
+            if (currentFile) {
+                updateFileName(currentFile.path);
+                updateFileLanguage(currentFile.path);
+                updateMarkdownToggle(currentFile.path);
+            }
+            
+            // ...rest of existing code...
+        }
     </script>
 </body>
 </html>
