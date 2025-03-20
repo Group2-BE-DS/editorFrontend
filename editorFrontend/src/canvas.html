@@ -672,38 +672,17 @@
         </div>
     </div>
 
-    <!-- Add this before the closing body tag -->
-<div id="collaborationModal" class="modal">
-    <div class="modal-content">
-        <h3 class="text-lg font-bold mb-4 text-white">Collaboration Options</h3>
-        <div class="flex flex-col gap-4">
-            <button id="createRoomBtn" class="confirm w-full">Create New Room</button>
-            <button id="joinRoomBtn" class="confirm w-full">Join Existing Room</button>
+    <!-- Replace the collaboration modals section with this simplified version -->
+    <div id="collaborationModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold mb-4 text-white">Create Collaboration Room</h3>
+            <input type="email" id="collaboratorEmail" placeholder="Enter collaborator's email">
+            <div class="flex justify-end mt-4">
+                <button id="confirmCreateRoom" class="confirm">Create & Invite</button>
+                <button id="cancelCreateRoom" class="cancel">Cancel</button>
+            </div>
         </div>
     </div>
-</div>
-
-<div id="createRoomModal" class="modal">
-    <div class="modal-content">
-        <h3 class="text-lg font-bold mb-4 text-white">Create Collaboration Room</h3>
-        <input type="email" id="collaboratorEmail" placeholder="Enter collaborator's email">
-        <div class="flex justify-end">
-            <button id="confirmCreateRoom" class="confirm">Create & Invite</button>
-            <button id="cancelCreateRoom" class="cancel">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<div id="joinRoomModal" class="modal">
-    <div class="modal-content">
-        <h3 class="text-lg font-bold mb-4 text-white">Join Collaboration Room</h3>
-        <input type="text" id="verificationCode" placeholder="Enter verification code">
-        <div class="flex justify-end">
-            <button id="confirmJoinRoom" class="confirm">Join Room</button>
-            <button id="cancelJoinRoom" class="cancel">Cancel</button>
-        </div>
-    </div>
-</div>
 
 <div id="statusBar" class="fixed bottom-0 left-0 right-0 h-8 bg-gray-900 border-t border-gray-700 flex items-center px-4 text-sm text-gray-300 z-40">
     <div class="flex items-center space-x-6">
@@ -1255,18 +1234,11 @@ if (!generateDocsBtn) {
             // Initialize
             fetchRepositoryName().then(loadFileTree);
 
-            // Add after the existing declarations in DOMContentLoaded
+            // Remove joinRoom related elements
             const collaborationModal = document.getElementById('collaborationModal');
-            const createRoomModal = document.getElementById('createRoomModal');
-            const joinRoomModal = document.getElementById('joinRoomModal');
-            const createRoomBtn = document.getElementById('createRoomBtn');
-            const joinRoomBtn = document.getElementById('joinRoomBtn');
             const confirmCreateRoom = document.getElementById('confirmCreateRoom');
             const cancelCreateRoom = document.getElementById('cancelCreateRoom');
-            const confirmJoinRoom = document.getElementById('confirmJoinRoom');
-            const cancelJoinRoom = document.getElementById('cancelJoinRoom');
             const collaboratorEmail = document.getElementById('collaboratorEmail');
-            const verificationCode = document.getElementById('verificationCode');
 
             // Update the shareCodeBtn click handler
             shareCodeBtn.addEventListener('click', function() {
@@ -1277,25 +1249,9 @@ if (!generateDocsBtn) {
                 }
             });
 
-            // Add handlers for room creation and joining
-            createRoomBtn.addEventListener('click', () => {
-                collaborationModal.style.display = 'none';
-                createRoomModal.style.display = 'flex';
-            });
-
-            joinRoomBtn.addEventListener('click', () => {
-                collaborationModal.style.display = 'none';
-                joinRoomModal.style.display = 'flex';
-            });
-
             cancelCreateRoom.addEventListener('click', () => {
-                createRoomModal.style.display = 'none';
+                collaborationModal.style.display = 'none';
                 collaboratorEmail.value = '';
-            });
-
-            cancelJoinRoom.addEventListener('click', () => {
-                joinRoomModal.style.display = 'none';
-                verificationCode.value = '';
             });
 
             confirmCreateRoom.addEventListener('click', async () => {
@@ -1312,15 +1268,18 @@ if (!generateDocsBtn) {
                             'Content-Type': 'application/json',
                             'Authorization': `Token ${sessionStorage.getItem('authToken')}`
                         },
-                        body: JSON.stringify({ emails: [email] })
+                        body: JSON.stringify({
+                            emails: [email],
+                            repository_id: repoId
+                        })
                     });
 
                     if (response.ok) {
                         const data = await response.json();
                         initializeWebSocket(data.code);
-                        createRoomModal.style.display = 'none';
+                        collaborationModal.style.display = 'none';
                         collaboratorEmail.value = '';
-                        alert('Invitation sent! Room created successfully.');
+                        alert('Invitation sent successfully!');
                     } else {
                         const error = await response.json();
                         alert(`Failed to create room: ${error.error || 'Unknown error'}`);
@@ -1331,19 +1290,7 @@ if (!generateDocsBtn) {
                 }
             });
 
-            confirmJoinRoom.addEventListener('click', () => {
-                const code = verificationCode.value.trim();
-                if (!code) {
-                    alert('Please enter a verification code');
-                    return;
-                }
-
-                initializeWebSocket(code);
-                joinRoomModal.style.display = 'none';
-                verificationCode.value = '';
-            });
-
-            // Update the WebSocket initialization function
+            // Update WebSocket initialization
             function initializeWebSocket(token) {
                 connectionStatus.textContent = 'Connecting...';
                 connectionStatus.className = 'connection-status';
