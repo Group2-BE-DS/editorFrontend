@@ -146,16 +146,49 @@
       </div>
     </div>
 
+    <!-- Collaboration Token Form -->
+    <div class="bg-gray-800 p-4 rounded-md mb-6 dark:bg-gray-700">
+    <h3 class="text-xl font-semibold dark:text-white mb-4">Join Collaboration Session</h3>
+    <form id="collaborationForm" class="space-y-4">
+        <div>
+            <label for="repoInput" class="block text-gray-400 dark:text-gray-300 mb-2">Repository Name</label>
+            <input
+                type="text"
+                id="repoInput"
+                class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600"
+                placeholder="username/repository-name"
+                required
+            />
+        </div>
+        <div>
+            <label for="passcodeInput" class="block text-gray-400 dark:text-gray-300 mb-2">Collaboration Passcode</label>
+            <input
+                type="text"
+                id="passcodeInput"
+                class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600"
+                placeholder="Enter collaboration passcode"
+                required
+            />
+        </div>
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+            Join Collaboration
+        </button>
+    </form>
+</div>
+
     <!-- Repository Cards -->
     <div class="repository-container">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="repositoryCards">
         <!-- Example Repository Card (will be dynamically added) -->
         <div class="max-w-xs bg-gray-800 p-6 rounded-lg shadow-lg dark:bg-gray-700 hidden" id="repoCardTemplate">
-          <h3 class="text-xl font-semibold dark:text-white" id="repoName"></h3>
-          <p class="text-gray-400 dark:text-gray-300" id="repoDescription"></p>
+          <h3 class="text-xl font-semibold dark:text-white repo-name"></h3>
+          <p class="text-gray-400 dark:text-gray-300 repo-description"></p>
           <div class="mt-4 flex justify-between items-center">
-            <a href="#" class="text-blue-500 hover:underline">View Details</a>
-            <a href="#" class="text-red-500 hover:underline" onclick="deleteRepository(event)">Delete</a>
+            <a href="#" class="text-blue-500 hover:underline" aria-label="View repository details">View Details</a>
+            <button class="text-red-500 hover:underline delete-repo" aria-label="Delete repository">Delete</button>
           </div>
         </div>
 
@@ -315,13 +348,16 @@
 
       try {
         const token = sessionStorage.getItem("authToken");
-        const response = await fetch("http://127.0.0.1:8000/fs/repositories/", {
+        const response = await fetch("http://127.0.0.1:8000/fs/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Token ${token}`,
           },
-          body: JSON.stringify({ name: repoName, description: repoDescription }),
+          body: JSON.stringify({ 
+            name: repoName, 
+            description: repoDescription 
+          }),
         });
 
         if (response.ok) {
@@ -330,9 +366,13 @@
           createRepoForm.classList.add("hidden");
           createRepoCard.classList.remove("hidden");
           repositoryForm.reset();
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Failed to create repository");
         }
       } catch (error) {
         console.error("Error creating repository:", error);
+        alert(error.message || "Failed to create repository. Please try again.");
       }
     });
 
@@ -341,12 +381,17 @@
       const repoCardTemplate = document.getElementById("repoCardTemplate");
       const newRepoCard = repoCardTemplate.cloneNode(true);
       newRepoCard.classList.remove("hidden");
-      newRepoCard.querySelector("#repoName").textContent = repo.name;
-      newRepoCard.querySelector("#repoDescription").textContent = repo.description;
-
-      // Update the "View Details" link to include the repository ID
-      const viewDetailsLink = newRepoCard.querySelector('a[href="#"]');
-      viewDetailsLink.href = `canvas.html?repoId=${repo.id}`; // Pass repository ID as a query parameter
+      newRepoCard.id = `repo-${repo.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+      newRepoCard.setAttribute("data-repo-slug", repo.slug);
+      
+      newRepoCard.querySelector(".repo-name").textContent = repo.name;
+      newRepoCard.querySelector(".repo-description").textContent = repo.description || "No description provided";
+      
+      const viewDetailsLink = newRepoCard.querySelector('a[aria-label="View repository details"]');
+      viewDetailsLink.href = `canvas.html?repo=${encodeURIComponent(repo.slug)}`;
+      
+      const deleteButton = newRepoCard.querySelector('.delete-repo');
+      deleteButton.onclick = (e) => deleteRepository(e);
 
       document.getElementById("repositoryCards").insertBefore(newRepoCard, createRepoCard);
     }
@@ -355,30 +400,34 @@
     function deleteRepository(event) {
       event.preventDefault();
       const repoCard = event.target.closest(".max-w-xs");
-      const repoId = repoCard.dataset.repoId; // Ensure each repo card has a data-repo-id attribute
+      const repoSlug = repoCard.getAttribute("data-repo-slug");
 
-      fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${sessionStorage.getItem("authToken")}`,
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            repoCard.remove();
-          }
+      if (confirm("Are you sure you want to delete this repository?")) {
+        fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${sessionStorage.getItem("authToken")}`,
+          },
         })
-        .catch((error) => {
-          console.error("Error deleting repository:", error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              repoCard.remove();
+            } else {
+              throw new Error("Failed to delete repository");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting repository:", error);
+            alert("Failed to delete repository. Please try again.");
+          });
+      }
     }
 
     // Fetch and display repositories on page load
     async function fetchRepositories() {
       try {
         const token = sessionStorage.getItem("authToken");
-        const response = await fetch("http://127.0.0.1:8000/fs/repositories/", {
-          method: "GET",
+        const response = await fetch("http://127.0.0.1:8000/fs/", {
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -387,14 +436,62 @@
         if (response.ok) {
           const repositories = await response.json();
           repositories.forEach((repo) => addRepositoryCard(repo));
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Failed to fetch repositories");
         }
       } catch (error) {
         console.error("Error fetching repositories:", error);
+        alert(error.message || "Failed to load repositories. Please try again.");
       }
     }
 
     // Fetch repositories on page load
     document.addEventListener("DOMContentLoaded", fetchRepositories);
+
+    // Handle collaboration token form submission
+    document.getElementById("collaborationForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const repoSlug = document.getElementById("repoInput").value.trim();
+      const passcode = document.getElementById("passcodeInput").value.trim();
+      const submitButton = event.target.querySelector('button[type="submit"]');
+
+      try {
+        if (!repoSlug || !passcode) {
+          throw new Error("Please enter both repository name and collaboration passcode.");
+        }
+
+        if (!/^[\w-]+\/[\w-]+$/.test(repoSlug)) {
+          throw new Error("Invalid repository format. Please use 'username/repository-name' format.");
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Joining...";
+
+        // Validate the repository and passcode before redirecting
+        const token = sessionStorage.getItem("authToken");
+        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/validate-collaboration`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+          body: JSON.stringify({ passcode }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Invalid repository or collaboration passcode.");
+        }
+
+        window.location.href = `canvas.html?repo=${encodeURIComponent(repoSlug)}&token=${encodeURIComponent(passcode)}&collaborate=true`;
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Join Collaboration";
+      }
+    });
+
   </script>
 </body>
 </html>

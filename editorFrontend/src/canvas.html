@@ -804,17 +804,18 @@
             let currentFile = null; // Stores { id, path }
             let currentRevision = 0; // Add this near the top of your DOMContentLoaded event handler
     
+            // Update URL parameter name in the script initialization
             const urlParams = new URLSearchParams(window.location.search);
-            const repoId = urlParams.get('repoId');
+            const repoSlug = urlParams.get('repo'); // Changed from repoId to repo
     
             async function fetchRepositoryName() {
-                if (!repoId) {
+                if (!repoSlug) {
                     repoNameElement.textContent = "No repository selected";
                     return;
                 }
                 try {
                     const token = sessionStorage.getItem('authToken');
-                    const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/`, {
+                    const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/`, {
                         headers: { Authorization: `Token ${token}` },
                     });
                     if (response.ok) {
@@ -853,39 +854,39 @@
     
             // Load initial file tree
             async function loadFileTree() {
-    try {
-        const token = sessionStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
-            headers: { Authorization: `Token ${token}` },
-        });
-        if (response.ok) {
-            const files = await response.json();
-            fileTree.querySelector('.file-tree').innerHTML = '';
-            files.forEach(file => addFileToTree(file));
-            // Optionally auto-open the first file
-            if (files.length > 0 && !currentFile) {
-                currentFile = { id: files[0].id, path: files[0].path };
-                currentFileName.textContent = files[0].path;
-                loadFileContent(files[0].id);
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/`, {
+                        headers: { Authorization: `Token ${token}` },
+                    });
+                    if (response.ok) {
+                        const files = await response.json();
+                        fileTree.querySelector('.file-tree').innerHTML = '';
+                        files.forEach(file => addFileToTree(file));
+                        // Optionally auto-open the first file
+                        if (files.length > 0 && !currentFile) {
+                            currentFile = { id: files[0].id, path: files[0].path };
+                            currentFileName.textContent = files[0].path;
+                            loadFileContent(files[0].id);
+                        }
+                    } else {
+                        console.error('Failed to load file tree:', await response.json());
+                    }
+                } catch (error) {
+                    console.error('Error loading file tree:', error);
+                }
             }
-        } else {
-            console.error('Failed to load file tree:', await response.json());
-        }
-    } catch (error) {
-        console.error('Error loading file tree:', error);
-    }
-}
 async function generateDocs() {
     console.log('Generate Docs button clicked');
-    console.log('repoId:', repoId, 'authToken:', sessionStorage.getItem('authToken'));
+    console.log('repoSlug:', repoSlug, 'authToken:', sessionStorage.getItem('authToken'));
 
     try {
         const token = sessionStorage.getItem('authToken');
         if (!token) throw new Error('No auth token found');
-        if (!repoId) throw new Error('No repoId defined');
+        if (!repoSlug) throw new Error('No Slug defined');
 
         console.log('Fetching repository contents...');
-        const contentsResponse = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/contents/`, {
+        const contentsResponse = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/contents/`, {
             method: 'GET',
             headers: {
                 Authorization: `Token ${token}`,
@@ -947,7 +948,7 @@ Return the markdown content directly, without any additional explanation or wrap
         console.log('Generated README content:', generatedContent);
 
         console.log('Saving README.md to backend...');
-        const saveResponse = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+        const saveResponse = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1083,8 +1084,7 @@ Return the markdown content directly, without any additional explanation or wrap
                     const content = editor.getValue();
                     try {
                         const token = sessionStorage.getItem('authToken');
-                        // Update the endpoint URL to match your backend
-                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${currentFile.id}/`, {
+                        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${currentFile.id}/`, {
                             method: 'PATCH',  // Changed from POST to PATCH
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1132,7 +1132,7 @@ Return the markdown content directly, without any additional explanation or wrap
                 if (confirm(`Are you sure you want to delete ${filePath}?`)) {
                     try {
                         const token = sessionStorage.getItem('authToken');
-                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileId}/`, {
+                        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${fileId}/`, {
                             method: 'DELETE',
                             headers: { Authorization: `Token ${token}` },
                         });
@@ -1171,7 +1171,7 @@ Return the markdown content directly, without any additional explanation or wrap
                     try {
                         const token = sessionStorage.getItem('authToken');
                         const payload = { path: fileName, content: '' };
-                        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/`, {
+                        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1643,7 +1643,7 @@ if (!generateDocsBtn) {
     // Step 1: Fetch content directly from REST API
     try {
         const token = sessionStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/fs/repositories/${repoId}/files/${fileId}/`, {
+        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${fileId}/`, {
             method: 'GET',
             headers: {
                 Authorization: `Token ${token}`,
