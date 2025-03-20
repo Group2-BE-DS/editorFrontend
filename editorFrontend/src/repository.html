@@ -468,29 +468,34 @@
         submitButton.disabled = true;
         submitButton.textContent = "Joining...";
 
-        // Validate the repository and passcode before redirecting
-        const token = sessionStorage.getItem("authToken");
-        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/validate-collaboration`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
-          },
-          body: JSON.stringify({ passcode }),
-        });
+        // Connect directly to WebSocket with the token
+        const wsUrl = `ws://localhost:8000/ws/editor/?token=${encodeURIComponent(passcode)}`;
+        const socket = new WebSocket(wsUrl);
 
-        if (!response.ok) {
-          throw new Error("Invalid repository or collaboration passcode.");
-        }
+        socket.onopen = () => {
+            // Redirect to canvas page with parameters
+            window.location.href = `canvas.html?repo=${encodeURIComponent(repoSlug)}&token=${encodeURIComponent(passcode)}`;
+        };
 
-        window.location.href = `canvas.html?repo=${encodeURIComponent(repoSlug)}&token=${encodeURIComponent(passcode)}&collaborate=true`;
-      } catch (error) {
+        socket.onerror = (error) => {
+            throw new Error("Invalid collaboration code or connection failed.");
+        };
+
+        // Set timeout for connection attempt
+        setTimeout(() => {
+            if (socket.readyState !== WebSocket.OPEN) {
+                socket.close();
+                throw new Error("Connection timeout. Please try again.");
+            }
+        }, 5000);
+
+    } catch (error) {
         alert(error.message);
-      } finally {
+    } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Join Collaboration";
-      }
-    });
+    }
+});
 
   </script>
 </body>
