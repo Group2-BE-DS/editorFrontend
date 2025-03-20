@@ -1256,37 +1256,55 @@ if (!generateDocsBtn) {
 
             confirmCreateRoom.addEventListener('click', async () => {
                 const email = collaboratorEmail.value.trim();
+                
+                // Better validation
                 if (!email) {
                     alert('Please enter a valid email address');
                     return;
                 }
-
+            
+                if (!repoSlug) {
+                    alert('Repository information is missing');
+                    return;
+                }
+            
                 try {
+                    const token = sessionStorage.getItem('authToken');
+                    if (!token) {
+                        throw new Error('Authentication token is missing');
+                    }
+            
+                    // Match the expected format from VerificationCodeSerializer
+                    const payload = {
+                        repoSlug: repoSlug,  // Match the exact field name expected by serializer
+                        emails: [email]      // Make sure it's an array as expected by the view
+                    };
+            
                     const response = await fetch('http://127.0.0.1:8000/collab/generate-code/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Token ${sessionStorage.getItem('authToken')}`
+                            'Authorization': `Token ${token}`
                         },
-                        body: JSON.stringify({
-                            emails: [email],
-                            repository_id: repoId
-                        })
+                        body: JSON.stringify(payload)
                     });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        initializeWebSocket(data.code);
-                        collaborationModal.style.display = 'none';
-                        collaboratorEmail.value = '';
-                        alert('Invitation sent successfully!');
-                    } else {
-                        const error = await response.json();
-                        alert(`Failed to create room: ${error.error || 'Unknown error'}`);
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || errorData.error || `Server error: ${response.status}`);
                     }
+            
+                    const data = await response.json();
+                    
+                    // Handle successful response
+                    initializeWebSocket(data.code);
+                    collaborationModal.style.display = 'none';
+                    collaboratorEmail.value = '';
+                    alert('Invitation sent successfully!');
+                    
                 } catch (error) {
-                    console.error('Error creating room:', error);
-                    alert('Failed to create room. Please try again.');
+                    console.error('Collaboration error details:', error);
+                    alert(`Failed to create collaboration: ${error.message}`);
                 }
             });
 
