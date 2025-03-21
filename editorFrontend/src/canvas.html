@@ -1361,76 +1361,85 @@ if (!generateDocsBtn) {
 
             // Update WebSocket initialization
             function initializeWebSocket(token) {
-                connectionStatus.textContent = 'Connecting...';
-                connectionStatus.className = 'connection-status';
-                connectionStatus.style.display = 'block';
+    connectionStatus.textContent = 'Connecting...';
+    connectionStatus.className = 'connection-status';
+    connectionStatus.style.display = 'block';
 
-                // Debug log
-                console.log('Attempting to connect with token:', token);
+    // Check for stored collaboration passcode
+    const collaborationPasscode = localStorage.getItem('collaborationPasscode');
+    
+    // If we have a stored passcode, use it and then clear it
+    if (collaborationPasscode) {
+        token = collaborationPasscode;
+        localStorage.removeItem('collaborationPasscode'); // Clear the stored passcode
+    }
 
-                const wsUrl = token 
-                    ? `ws://localhost:8000/ws/editor/?token=${encodeURIComponent(token)}`
-                    : 'ws://localhost:8000/ws/editor/';
-                console.log('WebSocket URL:', wsUrl);
+    // Debug log
+    console.log('Attempting to connect with token:', token);
 
-                socket = new WebSocket(wsUrl);
+    const wsUrl = token 
+        ? `ws://localhost:8000/ws/editor/?token=${encodeURIComponent(token)}`
+        : 'ws://localhost:8000/ws/editor/';
+    console.log('WebSocket URL:', wsUrl);
 
-                socket.onopen = function() {
-                    console.log('WebSocket connection established');
-                    connectionStatus.textContent = 'Connected!';
-                    connectionStatus.classList.add('connected');
-                    setTimeout(() => connectionStatus.style.display = 'none', 2000);
-                };
+    socket = new WebSocket(wsUrl);
 
-                socket.onmessage = function(event) {
-                    const message = JSON.parse(event.data);
-                    console.log('Received message:', message);
+    socket.onopen = function() {
+        console.log('WebSocket connection established');
+        connectionStatus.textContent = 'Connected!';
+        connectionStatus.classList.add('connected');
+        setTimeout(() => connectionStatus.style.display = 'none', 2000);
+    };
 
-                    switch(message.type) {
-                        case 'update':
-                        case 'fileUpdated':
-                            if (currentFile && message.fileId === currentFile.id) {
-                                handleContentUpdate(message.content, message.revision);
-                            }
-                            break;
+    socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        console.log('Received message:', message);
 
-                        case 'fileData':
-                            if (currentFile && message.fileId === currentFile.id) {
-                                handleInitialFileLoad(message);
-                            }
-                            break;
+        switch(message.type) {
+            case 'update':
+            case 'fileUpdated':
+                if (currentFile && message.fileId === currentFile.id) {
+                    handleContentUpdate(message.content, message.revision);
+                }
+                break;
 
-                        case 'collaboration_started':
-                            handleCollaborationStart();
-                            break;
+            case 'fileData':
+                if (currentFile && message.fileId === currentFile.id) {
+                    handleInitialFileLoad(message);
+                }
+                break;
 
-                        case 'cursor_update':
-                            if (currentFile && message.fileId === currentFile.id) {
-                                handleCollaboratorCursor(message);
-                            }
-                            break;
+            case 'collaboration_started':
+                handleCollaborationStart();
+                break;
 
-                        case 'error':
-                            handleError(message);
-                            break;
-                    }
-                };
+            case 'cursor_update':
+                if (currentFile && message.fileId === currentFile.id) {
+                    handleCollaboratorCursor(message);
+                }
+                break;
 
-                socket.onerror = function(error) {
-                    console.error('WebSocket Error:', error);
-                    connectionStatus.textContent = 'Connection Failed!';
-                    connectionStatus.classList.add('error');
-                };
+            case 'error':
+                handleError(message);
+                break;
+        }
+    };
 
-                socket.onclose = function() {
-                    console.log('WebSocket connection closed');
-                    isCollaborating = false;
-                    shareCodeBtn.classList.remove('collaboration-active');
-                    shareCodeBtn.querySelector('span').textContent = 'Share Code';
-                    connectionStatus.textContent = 'Disconnected';
-                    setTimeout(() => connectionStatus.style.display = 'none', 3000);
-                };
-            }
+    socket.onerror = function(error) {
+        console.error('WebSocket Error:', error);
+        connectionStatus.textContent = 'Connection Failed!';
+        connectionStatus.classList.add('error');
+    };
+
+    socket.onclose = function() {
+        console.log('WebSocket connection closed');
+        isCollaborating = false;
+        shareCodeBtn.classList.remove('collaboration-active');
+        shareCodeBtn.querySelector('span').textContent = 'Share Code';
+        connectionStatus.textContent = 'Disconnected';
+        setTimeout(() => connectionStatus.style.display = 'none', 3000);
+    };
+}
 
             // Add these helper functions
             function handleContentUpdate(newContent, revision) {

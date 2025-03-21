@@ -502,7 +502,6 @@
         event.preventDefault();
         const repoSlug = document.getElementById("repoInput").value.trim();
         const passcode = document.getElementById("passcodeInput").value.trim();
-        const submitButton = event.target.querySelector('button[type="submit"]');
 
         try {
           if (!repoSlug || !passcode) {
@@ -513,35 +512,14 @@
             throw new Error("Invalid repository format. Please use 'username/repository-name' format.");
           }
 
-          submitButton.disabled = true;
-          submitButton.textContent = "Joining...";
+          // Store the passcode in localStorage
+          localStorage.setItem('collaborationPasscode', passcode);
 
-          // Connect directly to WebSocket with the token
-          const wsUrl = `ws://localhost:8000/ws/editor/?token=${encodeURIComponent(passcode)}`;
-          const socket = new WebSocket(wsUrl);
-
-          socket.onopen = () => {
-            // Redirect to canvas page with parameters
-            window.location.href = `canvas.html?repo=${encodeURIComponent(repoSlug)}&token=${encodeURIComponent(passcode)}`;
-          };
-
-          socket.onerror = (error) => {
-            throw new Error("Invalid collaboration code or connection failed.");
-          };
-
-          // Set timeout for connection attempt
-          setTimeout(() => {
-            if (socket.readyState !== WebSocket.OPEN) {
-              socket.close();
-              throw new Error("Connection timeout. Please try again.");
-            }
-          }, 5000);
+          // Redirect to canvas.html with repo parameter
+          window.location.href = `canvas.html?repo=${repoSlug}`;
 
         } catch (error) {
           alert(error.message);
-        } finally {
-          submitButton.disabled = false;
-          submitButton.textContent = "Join Collaboration";
         }
       });
 
