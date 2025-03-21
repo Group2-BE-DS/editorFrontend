@@ -253,8 +253,14 @@
       <form id="collaborationForm" class="space-y-4">
         <div>
           <label for="repoInput" class="block text-gray-400 dark:text-gray-300 mb-2">Repository Name</label>
-          <input type="text" id="repoInput" class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600"
-            placeholder="username/repository-name" required />
+          <div class="relative">
+            <input type="text" id="repoSearchInput" class="w-full p-3 bg-gray-700 text-white rounded-lg dark:bg-gray-600" 
+                   placeholder="Search repositories..." autocomplete="off"/>
+            <div id="repoDropdown" class="absolute z-10 w-full mt-1 bg-gray-700 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+              <!-- Dropdown options will be populated here -->
+            </div>
+          </div>
+          <input type="hidden" id="selectedRepoSlug" />
         </div>
         <div>
           <label for="passcodeInput" class="block text-gray-400 dark:text-gray-300 mb-2">Collaboration Passcode</label>
@@ -496,6 +502,125 @@
 
       // Fetch repositories on page load
       document.addEventListener("DOMContentLoaded", fetchRepositories);
+
+      // Add this to your script section before the collaboration form event listener
+      const repoSearchInput = document.getElementById("repoSearchInput");
+      const repoDropdown = document.getElementById("repoDropdown");
+      const selectedRepoSlug = document.getElementById("selectedRepoSlug");
+
+      // Fetch repositories for the dropdown
+      async function fetchRepositoriesForDropdown() {
+        try {
+          const token = sessionStorage.getItem("authToken");
+          const response = await fetch("http://127.0.0.1:8000/fs/all", {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const repositories = await response.json();
+            return repositories;
+          }
+          return [];
+        } catch (error) {
+          console.error("Error fetching repositories:", error);
+          return [];
+        }
+      }
+
+      // Replace the existing filterRepositories function with this updated version
+      async function filterRepositories(searchTerm) {
+        try {
+          const response = await fetchRepositoriesForDropdown();
+          
+          // Extract the repositories array from the response
+          const repositories = response.repositories || [];
+          
+          if (!Array.isArray(repositories)) {
+            console.error('Repositories data is not an array:', repositories);
+            return;
+          }
+      
+          const filteredRepos = repositories.filter(repo => 
+            repo && repo.name && repo.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+      
+          repoDropdown.innerHTML = '';
+          
+          if (filteredRepos.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'p-2 text-gray-400 text-center';
+            noResults.textContent = 'No repositories found';
+            repoDropdown.appendChild(noResults);
+            repoDropdown.classList.remove('hidden');
+            return;
+          }
+      
+          filteredRepos.forEach(repo => {
+            const option = document.createElement('div');
+            option.className = 'p-2 hover:bg-gray-600 cursor-pointer text-white';
+            option.textContent = repo.name;
+            option.dataset.slug = repo.slug;
+            
+            option.addEventListener('click', () => {
+              repoSearchInput.value = repo.name;
+              selectedRepoSlug.value = repo.slug;
+              repoDropdown.classList.add('hidden');
+            });
+            
+            repoDropdown.appendChild(option);
+          });
+      
+          repoDropdown.classList.remove('hidden');
+        } catch (error) {
+          console.error('Error filtering repositories:', error);
+          repoDropdown.innerHTML = '';
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'p-2 text-red-400 text-center';
+          errorMessage.textContent = 'Error loading repositories';
+          repoDropdown.appendChild(errorMessage);
+          repoDropdown.classList.remove('hidden');
+        }
+      }
+
+      // Add event listeners for the search input
+      repoSearchInput.addEventListener('input', (e) => {
+        filterRepositories(e.target.value);
+      });
+
+      repoSearchInput.addEventListener('focus', () => {
+        filterRepositories(repoSearchInput.value);
+      });
+
+      // Hide dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!repoSearchInput.contains(e.target) && !repoDropdown.contains(e.target)) {
+          repoDropdown.classList.add('hidden');
+        }
+      });
+
+      // Update the collaboration form submit handler
+      document.getElementById("collaborationForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const repoSlug = selectedRepoSlug.value;
+        const passcode = document.getElementById("passcodeInput").value.trim();
+
+        try {
+          if (!repoSlug || !passcode) {
+            throw new Error("Please select a repository and enter collaboration passcode.");
+          }
+
+          // Store the passcode in localStorage
+          localStorage.setItem('collaborationPasscode', passcode);
+
+          // Redirect to canvas.html with repo parameter
+          window.location.href = `canvas.html?repo=${repoSlug}`;
+
+        } catch (error) {
+          alert(error.message);
+        }
+      });
 
       // Handle collaboration token form submission
       document.getElementById("collaborationForm").addEventListener("submit", async function (event) {
