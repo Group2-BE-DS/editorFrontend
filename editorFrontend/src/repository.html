@@ -627,24 +627,27 @@
         event.preventDefault();
         const repoSlug = document.getElementById("repoInput").value.trim();
         const passcode = document.getElementById("passcodeInput").value.trim();
+        const submitButton = event.target.querySelector('button[type="submit"]');
 
         try {
-          if (!repoSlug || !passcode) {
-            throw new Error("Please enter both repository name and collaboration passcode.");
-          }
+            if (!repoSlug || !passcode) {
+                throw new Error("Please enter both repository name and collaboration passcode.");
+            }
 
-          if (!/^[\w-]+\/[\w-]+$/.test(repoSlug)) {
-            throw new Error("Invalid repository format. Please use 'username/repository-name' format.");
-          }
+            submitButton.disabled = true;
+            submitButton.textContent = "Joining...";
 
-          // Store the passcode in localStorage
-          localStorage.setItem('collaborationPasscode', passcode);
+            // Store the passcode in localStorage
+            localStorage.setItem('collaborationPasscode', passcode);
 
-          // Redirect to canvas.html with repo parameter
-          window.location.href = `canvas.html?repo=${repoSlug}`;
+            // Redirect to canvas page with repo parameter
+            window.location.href = `canvas.html?repo=${encodeURIComponent(repoSlug)}`;
 
         } catch (error) {
-          alert(error.message);
+            alert(error.message);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Join Collaboration";
         }
       });
 

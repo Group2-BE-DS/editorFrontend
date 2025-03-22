@@ -517,6 +517,40 @@
             background-color: rgba(74, 85, 104, 0.4);
             border-radius: 0.25rem;
         }
+
+        /* Add these to your existing styles */
+        #collaboratorsPanel {
+            min-width: 250px;
+            background-color: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(4px);
+        }
+
+        #collaboratorsList::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #collaboratorsList::-webkit-scrollbar-track {
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 3px;
+        }
+
+        #collaboratorsList::-webkit-scrollbar-thumb {
+            background-color: rgba(75, 85, 99, 0.5);
+            border-radius: 3px;
+        }
+
+        .user-joined-notification {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .collaboration-active #collaboratorsPanel {
+    display: block !important;
+}
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
     </style>
 </head>
 <body >
@@ -833,6 +867,7 @@
             let isCollaborating = false;
             let currentFile = null; // Stores { id, path }
             let currentRevision = 0; // Add this near the top of your DOMContentLoaded event handler
+            let wsConnected = false; // Add this at the beginning of your DOMContentLoaded event listener
     
             // Update URL parameter name in the script initialization
             const urlParams = new URLSearchParams(window.location.search);
@@ -1072,19 +1107,65 @@ Return the markdown content directly, without any additional explanation or wrap
                 currentFileName.textContent = 'No file selected';
             }
     
-            function loadFileContent(fileId) {
-                console.log('Loading file:', fileId);  // Debug log
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    socket.send(JSON.stringify({
-                        type: 'openFile',
-                        fileId: fileId
-                    }));
-                } else {
-                    console.error('WebSocket not connected');
+            async function loadFileContent(fileId) {
+                console.log('Loading file:', fileId);
+                
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${fileId}/`, {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Token ${token}`,
+                        },
+                    });
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Failed to fetch file content:', errorData);
+                        showErrorNotification(errorData.detail || 'Failed to load file');
+                        return;
+                    }
+            
+                    const fileData = await response.json();
+                    console.log('Fetched file data:', fileData);
+            
+                    // Update editor content and settings
+                    editor.setValue(fileData.content || '');
+                    currentRevision = 0;
+                    
+                    // Update UI elements
+                    updateFileName(fileData.path);
+                    updateFileLanguage(fileData.path);
+                    updateMarkdownToggle(fileData.path);
+                    showEditor();
+            
+                    // Notify WebSocket if connected
+                    if (wsConnected && socket && socket.readyState === WebSocket.OPEN) {
+                        console.log('Syncing file with WebSocket...');
+                        socket.send(JSON.stringify({
+                            type: 'openFile',
+                            fileId: fileId
+                        }));
+                    } else {
+                        console.log('WebSocket not available, using REST API only');
+                    }
+            
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    showErrorNotification('Error loading file content');
                 }
-                if (currentFile) {
-                    updateFileLanguage(currentFile.path);
-                }
+            }
+            
+            // Add this helper function for error notifications
+            function showErrorNotification(message) {
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.textContent = message;
+                connectionStatus.className = 'connection-status error';
+                connectionStatus.style.display = 'block';
+                
+                setTimeout(() => {
+                    connectionStatus.style.display = 'none';
+                }, 3000);
             }
     
             function setLanguageMode(fileExt) {
@@ -1386,9 +1467,18 @@ if (!generateDocsBtn) {
 
     socket.onopen = function() {
         console.log('WebSocket connection established');
+        wsConnected = true; // Set the connection flag
         connectionStatus.textContent = 'Connected!';
         connectionStatus.classList.add('connected');
         setTimeout(() => connectionStatus.style.display = 'none', 2000);
+
+        // If we have a current file, sync it immediately
+        if (currentFile) {
+            socket.send(JSON.stringify({
+                type: 'openFile',
+                fileId: currentFile.id
+            }));
+        }
     };
 
     socket.onmessage = function(event) {
@@ -1433,9 +1523,11 @@ if (!generateDocsBtn) {
 
     socket.onclose = function() {
         console.log('WebSocket connection closed');
+        wsConnected = false; // Reset the connection flag
         isCollaborating = false;
         shareCodeBtn.classList.remove('collaboration-active');
         shareCodeBtn.querySelector('span').textContent = 'Share Code';
+        document.getElementById('collaboratorsPanel').classList.add('hidden');
         connectionStatus.textContent = 'Disconnected';
         setTimeout(() => connectionStatus.style.display = 'none', 3000);
     };
@@ -1660,48 +1752,48 @@ if (!generateDocsBtn) {
 
             // Update file language when file is loaded
             async function loadFileContent(fileId) {
-    console.log('Loading file:', fileId);  // Debug log
+                console.log('Loading file:', fileId);  // Debug log
 
-    // Step 1: Fetch content directly from REST API
-    try {
-        const token = sessionStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${fileId}/`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Token ${token}`,
-            },
-        });
+                // Step 1: Fetch content directly from REST API
+                try {
+                    const token = sessionStorage.getItem('authToken');
+                    const response = await fetch(`http://127.0.0.1:8000/fs/${encodeURIComponent(repoSlug)}/files/${fileId}/`, {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Token ${token}`,
+                        },
+                    });
 
-        if (response.ok) {
-            const fileData = await response.json();
-            console.log('Fetched file data:', fileData);  // Debug log
-            editor.setValue(fileData.content || '');  // Set editor content
-            currentRevision = 0;  // Reset revision for WebSocket sync
-            setLanguageMode(fileData.path.split('.').pop().toLowerCase());  // Set language
-            updateFileLanguage(fileData.path);  // Update status bar
-            updateMarkdownToggle(fileData.path); // Add this line
-            showEditor();  // Ensure editor is visible
-        } else {
-            console.error('Failed to fetch file content:', await response.json());
-            alert('Failed to load file content. Check console for details.');
-            return;
-        }
-    } catch (error) {
-        console.error('Error fetching file content:', error);
-        alert('Error loading file content. Check console for details.');
-        return;
-    }
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        console.log('Fetched file data:', fileData);  // Debug log
+                        editor.setValue(fileData.content || '');  // Set editor content
+                        currentRevision = 0;  // Reset revision for WebSocket sync
+                        setLanguageMode(fileData.path.split('.').pop().toLowerCase());  // Set language
+                        updateFileLanguage(fileData.path);  // Update status bar
+                        updateMarkdownToggle(fileData.path); // Add this line
+                        showEditor();  // Ensure editor is visible
+                    } else {
+                        console.error('Failed to fetch file content:', await response.json());
+                        alert('Failed to load file content. Check console for details.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error fetching file content:', error);
+                    alert('Error loading file content. Check console for details.');
+                    return;
+                }
 
-    // Step 2: Request WebSocket sync (if connected)
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-            type: 'openFile',
-            fileId: fileId
-        }));
-    } else {
-        console.warn('WebSocket not connected; relying on REST API fetch');
-    }
-}
+                // Step 2: Request WebSocket sync (if connected)
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'openFile',
+                        fileId: fileId
+                    }));
+                } else {
+                    console.warn('WebSocket not connected; relying on REST API fetch');
+                }
+            }
 
             // Add this inside your DOMContentLoaded event listener
             const historyToggle = document.getElementById('historyToggle');
@@ -1798,43 +1890,61 @@ if (!generateDocsBtn) {
             shareCodeBtn.classList.add('collaboration-active');
             shareCodeBtn.querySelector('span').textContent = 'Stop Sharing';
             
-            // Show collaborators panel
-            const collaboratorsPanel = document.getElementById('collaboratorsPanel');
-            collaboratorsPanel.classList.remove('hidden');
-            
-            // Update users count
-            document.getElementById('userCount').textContent = `${users.length} online`;
-            
-            // Update the collaborators list
+            // Update users list immediately
             updateCollaboratorsList(users);
         }
 
         function updateCollaboratorsList(users) {
             const collaboratorsList = document.getElementById('collaboratorsList');
+            const userCount = document.getElementById('userCount');
+            
+            // Update user count
+            userCount.textContent = `${users.length} ${users.length === 1 ? 'user' : 'users'}`;
+            
+            // Clear and update the list
             collaboratorsList.innerHTML = '';
             
             users.forEach(user => {
                 const userElement = document.createElement('div');
-                userElement.className = 'flex items-center gap-2 p-2 rounded bg-gray-700';
+                userElement.className = 'flex items-center justify-between p-2 rounded bg-gray-700 text-white';
+                
+                const joinedAt = new Date(user.joined_at).toLocaleTimeString();
+                
                 userElement.innerHTML = `
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span class="text-white text-sm">${user.name || 'Anonymous'}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-sm">${user.username}</span>
+                    </div>
+                    <span class="text-xs text-gray-400">joined at ${joinedAt}</span>
                 `;
+                
                 collaboratorsList.appendChild(userElement);
             });
+            
+            // Show the collaborators panel
+            document.getElementById('collaboratorsPanel').classList.remove('hidden');
         }
 
-        // Update your socket message handler
+        // Update the WebSocket message handler
         socket.onmessage = function(event) {
             const message = JSON.parse(event.data);
-            
+            console.log('Received message:', message);
+
             switch(message.type) {
-                // ...existing cases...
-                
-                case 'users_update':
+                case 'collaboration_update':
+                    if (message.event === 'user_joined') {
+                        // Show notification for new user
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50';
+                        notification.textContent = `${message.user.username} joined the session`;
+                        document.body.appendChild(notification);
+                        setTimeout(() => notification.remove(), 3000);
+                    }
+                    // Update the users list regardless of event type
                     updateCollaboratorsList(message.users);
-                    document.getElementById('userCount').textContent = `${message.users.length} online`;
                     break;
+
+                // ...existing cases...
             }
         };
 
